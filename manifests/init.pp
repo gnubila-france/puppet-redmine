@@ -87,6 +87,16 @@
 #
 #
 class redmine (
+  $db_type             = params_lookup( 'db_type' ),
+  $db_user             = params_lookup( 'db_user' ),
+  $db_password         = params_lookup( 'db_password' ),
+  $db_host             = params_lookup( 'db_host' ),
+  $db_port             = params_lookup( 'db_port' ),
+  $webserver_type      = params_lookup( 'webserver_type' ),
+  $vhost_template      = params_lookup( 'vhost_template' ),
+  $install_dir         = params_lookup( 'install_dir' ),
+  $install_type        = params_lookup( 'install_type' ),
+  $dependencies        = params_lookup( 'dependencies' ),
   $my_class            = params_lookup( 'my_class' ),
   $source              = params_lookup( 'source' ),
   $source_dir          = params_lookup( 'source_dir' ),
@@ -184,4 +194,25 @@ class redmine (
     include $redmine::my_class
   }
 
+  # TODO install deps if needed/asked (ruby, ...)
+  if $dependencies {
+    include redmine::dependencies
+  }
+
+  # TODO instal redmine using puppet::netinstall or vcsrepo if
+  # install_type == source else use package
+  if $install_type == 'source' {
+    # puppi::netinstall { 'redmine':
+    #}
+  }
+
+  # Setup database
+  include redmine::$db_type
+
+  # Setup webserver
+  include redmine::$webserver_type
+
+  Class["redmine::${db_type}"]->Class["redmine::${webserver_type}"]
 }
+
+# vim: set et sw=2:
