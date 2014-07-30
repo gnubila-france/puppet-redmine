@@ -88,10 +88,10 @@
 #
 class redmine (
   $db_type             = params_lookup( 'db_type' ),
+  $db_name             = params_lookup( 'db_name' ),
   $db_user             = params_lookup( 'db_user' ),
   $db_password         = params_lookup( 'db_password' ),
   $db_host             = params_lookup( 'db_host' ),
-  $db_port             = params_lookup( 'db_port' ),
   $webserver_type      = params_lookup( 'webserver_type' ),
   $vhost_template      = params_lookup( 'vhost_template' ),
   $install_dir         = params_lookup( 'install_dir' ),
@@ -196,7 +196,7 @@ class redmine (
 
   # TODO install deps if needed/asked (ruby, ...)
   if $dependencies {
-    include redmine::dependencies
+    include ::redmine::dependencies
   }
 
   # TODO instal redmine using puppet::netinstall or vcsrepo if
@@ -207,12 +207,14 @@ class redmine (
   }
 
   # Setup database
-  include redmine::$db_type
+  include ::redmine::$db_type
 
   # Setup webserver
-  include redmine::$webserver_type
+  if $webserver_type != undef {
+    include ::redmine::$webserver_type
 
-  Class["redmine::${db_type}"]->Class["redmine::${webserver_type}"]
+    Class["::redmine::${db_type}"]->Class["::redmine::${webserver_type}"]
+  }
 }
 
 # vim: set et sw=2:

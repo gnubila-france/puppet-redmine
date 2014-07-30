@@ -40,6 +40,17 @@ class redmine::params {
     default => 'root',
   }
 
+  $db_type = 'mysql'
+  $db_name = 'redmine'
+  $db_user = 'redmine'
+  $db_password = 'redmine'
+  $db_host = 'localhost'
+  $webserver_type = undef
+  $vhost_template = ""
+  $install_dir = ""
+  $install_type = ""
+  $dependencies = false
+
   # General Settings
   $my_class = ''
   $source = ''
