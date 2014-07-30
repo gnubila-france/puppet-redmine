@@ -201,10 +201,10 @@ class redmine (
 
   # TODO instal redmine using puppet::netinstall or vcsrepo if
   # install_type == source else use package
-  if $install_type == 'source' {
+  #if $install_type == 'source' {
     # puppi::netinstall { 'redmine':
     #}
-  }
+  #}
 
   # Setup database
   include ::redmine::$db_type
