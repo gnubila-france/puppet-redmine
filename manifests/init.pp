@@ -96,6 +96,9 @@ class redmine (
   $vhost_template      = params_lookup( 'vhost_template' ),
   $install_dir         = params_lookup( 'install_dir' ),
   $install_type        = params_lookup( 'install_type' ),
+  $version             = params_lookup( 'version' ),
+  $owner               = params_lookup( 'owner' ),
+  $group               = params_lookup( 'group' ),
   $dependencies        = params_lookup( 'dependencies' ),
   $my_class            = params_lookup( 'my_class' ),
   $source              = params_lookup( 'source' ),
@@ -201,10 +204,14 @@ class redmine (
 
   # TODO instal redmine using puppet::netinstall or vcsrepo if
   # install_type == source else use package
-  #if $install_type == 'source' {
-    # puppi::netinstall { 'redmine':
-    #}
-  #}
+  if $install_type == 'source' {
+    puppi::netinstall { 'redmine':
+      url             => "${install_url_base}/redmine-${version}.tar.gz"
+      destination_dir => $install_dir,
+      owner           => $owner,
+      group           => $group,
+    }
+  }
 
   # Setup database
   include "redmine::${db_type}"
