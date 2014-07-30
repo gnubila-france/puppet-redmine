@@ -196,7 +196,7 @@ class redmine (
 
   # TODO install deps if needed/asked (ruby, ...)
   if $dependencies {
-    include ::redmine::dependencies
+    include redmine::dependencies
   }
 
   # TODO instal redmine using puppet::netinstall or vcsrepo if
@@ -207,11 +207,11 @@ class redmine (
   #}
 
   # Setup database
-  include ::redmine::$db_type
+  include "redmine::${db_type}"
 
   # Setup webserver
   if $webserver_type != undef {
-    include ::redmine::$webserver_type
+    include "redmine::${webserver_type}"
 
     Class["::redmine::${db_type}"]->Class["::redmine::${webserver_type}"]
   }
