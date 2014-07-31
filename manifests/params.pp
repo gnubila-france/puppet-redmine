@@ -54,12 +54,17 @@ class redmine::params {
     default => "${install_dir}/redmine/config/configuration.yml",
   }
 
+  $db_config_file = $::operatingsystem ? {
+    default => "${install_dir}/redmine/config/database.yml",
+  }
+
   # General Settings
   $my_class = ''
   $source = ''
   $source_dir = ''
   $source_dir_purge = false
   $template = 'redmine/configuration.yml.erb'
+  $db_template = 'redmine/database.yml.erb'
   $options = ''
   $version = 'present'
   $absent = false

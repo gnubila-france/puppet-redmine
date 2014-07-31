@@ -105,6 +105,7 @@ class redmine (
   $source_dir          = params_lookup( 'source_dir' ),
   $source_dir_purge    = params_lookup( 'source_dir_purge' ),
   $template            = params_lookup( 'template' ),
+  $db_template         = params_lookup( 'db_template' ),
   $options             = params_lookup( 'options' ),
   $absent              = params_lookup( 'absent' ),
   $audit_only          = params_lookup( 'audit_only' , 'global' ),
@@ -156,6 +157,11 @@ class redmine (
     default   => template($redmine::template),
   }
 
+  $manage_db_file_content = $redmine::db_template ? {
+    ''        => undef,
+    default   => template($redmine::db_template),
+  }
+
   ### Managed resources
   case $redmine::install_type {
     'source': {
@@ -193,8 +199,20 @@ class redmine (
     owner   => $redmine::config_file_owner,
     group   => $redmine::config_file_group,
     require => $redmine::fileconf_require,
-    source  => $redmine::manage_file_source,
     content => $redmine::manage_file_content,
+    replace => $redmine::manage_file_replace,
+    audit   => $redmine::manage_audit,
+    noop    => $redmine::bool_noops,
+  }
+
+  file { 'redmine-database.conf':
+    ensure  => $redmine::manage_file,
+    path    => $redmine::db_config_file,
+    mode    => $redmine::config_file_mode,
+    owner   => $redmine::config_file_owner,
+    group   => $redmine::config_file_group,
+    require => $redmine::fileconf_require,
+    content => $redmine::manage_db_file_content,
     replace => $redmine::manage_file_replace,
     audit   => $redmine::manage_audit,
     noop    => $redmine::bool_noops,
