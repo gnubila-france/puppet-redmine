@@ -244,7 +244,6 @@ class redmine (
     include $redmine::my_class
   }
 
-  # TODO install deps if needed/asked (ruby, ...)
   if $redmine::dependencies {
     include redmine::dependencies
   }
