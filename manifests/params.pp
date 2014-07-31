@@ -16,16 +16,22 @@ class redmine::params {
 
   ### Application related parameters
 
+  $db_type = 'mysql'
+  $db_name = 'redmine'
+  $db_user = 'redmine'
+  $db_password = 'redmine'
+  $db_host = 'localhost'
+  $webserver_type = undef
+  $vhost_template = ''
+  $owner = 'www-data'
+  $group = 'www-data'
+  $install_dir = '/usr/local/lib'
+  $install_type = 'package'
+  $install_url_base = 'http://www.redmine.org/releases'
+  $dependencies = false
+
   $package = $::operatingsystem ? {
     default => 'redmine',
-  }
-
-  $config_dir = $::operatingsystem ? {
-    default => '/etc/redmine',
-  }
-
-  $config_file = $::operatingsystem ? {
-    default => '/etc/redmine/redmine.conf',
   }
 
   $config_file_mode = $::operatingsystem ? {
@@ -40,19 +46,13 @@ class redmine::params {
     default => 'root',
   }
 
-  $db_type = 'mysql'
-  $db_name = 'redmine'
-  $db_user = 'redmine'
-  $db_password = 'redmine'
-  $db_host = 'localhost'
-  $webserver_type = undef
-  $vhost_template = ""
-  $owner = 'www-data'
-  $group = 'www-data'
-  $install_dir = '/usr/local/lib'
-  $install_type = 'package'
-  $install_url_base = 'http://www.redmine.org/releases'
-  $dependencies = false
+  $config_dir = $::operatingsystem ? {
+    default => "${install_dir}/redmine/config",
+  }
+
+  $config_file = $::operatingsystem ? {
+    default => "${install_dir}/redmine/config/configuration.yaml",
+  }
 
   # General Settings
   $my_class = ''
