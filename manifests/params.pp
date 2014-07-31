@@ -23,9 +23,10 @@ class redmine::params {
   $db_host = 'localhost'
   $webserver_type = undef
   $vhost_template = ''
-  $owner = 'root'
-  $group = 'root'
-  $install_dir = '/usr/local/lib'
+  $ruby_version = '1.9.3',
+  $owner = 'redmine'
+  $group = 'redmine'
+  $install_dir = '/home/redmine'
   $install_type = 'package'
   $install_url_base = 'http://www.redmine.org/releases'
 
