@@ -168,7 +168,7 @@ class redmine (
     mode    => $redmine::config_file_mode,
     owner   => $redmine::config_file_owner,
     group   => $redmine::config_file_group,
-    require => $redmiune::fileconf_require,
+    require => $redmine::fileconf_require,
     source  => $redmine::manage_file_source,
     content => $redmine::manage_file_content,
     replace => $redmine::manage_file_replace,
