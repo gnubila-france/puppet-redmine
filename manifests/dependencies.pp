@@ -1,4 +1,10 @@
 class redmine::dependencies {
+  package { 'rubygems':
+    ensure => $redmine::manage_package,
+  }
+  package { 'rake':
+    ensure => $redmine::manage_package,
+  }
   package { 'imagemagick':
     ensure => $redmine::manage_package,
   }
