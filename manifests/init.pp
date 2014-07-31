@@ -206,7 +206,7 @@ class redmine (
   # install_type == source else use package
   if $install_type == 'source' {
     puppi::netinstall { 'redmine':
-      url             => "${install_url_base}/redmine-${version}.tar.gz"
+      url             => "${install_url_base}/redmine-${version}.tar.gz",
       destination_dir => $install_dir,
       owner           => $owner,
       group           => $group,
