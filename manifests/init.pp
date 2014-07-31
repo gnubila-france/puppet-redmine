@@ -156,6 +156,7 @@ class redmine (
     default   => template($redmine::template),
   }
 
+  ### Managed resources
   case $redmine::install_type {
     'source': {
       $url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
@@ -179,7 +180,6 @@ class redmine (
     'package' => Package[$redmine::package],
   }
 
-  ### Managed resources
   file { 'redmine.conf':
     ensure  => $redmine::manage_file,
     path    => $redmine::config_file,
