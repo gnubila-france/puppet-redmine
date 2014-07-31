@@ -106,7 +106,6 @@ class redmine (
   $source_dir_purge    = params_lookup( 'source_dir_purge' ),
   $template            = params_lookup( 'template' ),
   $options             = params_lookup( 'options' ),
-  $version             = params_lookup( 'version' ),
   $absent              = params_lookup( 'absent' ),
   $audit_only          = params_lookup( 'audit_only' , 'global' ),
   $noops               = params_lookup( 'noops' ),
@@ -156,11 +155,6 @@ class redmine (
   }
 
   ### Managed resources
-  package { $redmine::package:
-    ensure  => $redmine::manage_package,
-    noop    => $redmine::bool_noops,
-  }
-
   file { 'redmine.conf':
     ensure  => $redmine::manage_file,
     path    => $redmine::config_file,
@@ -191,7 +185,6 @@ class redmine (
     }
   }
 
-
   ### Include custom class if $my_class is set
   if $redmine::my_class {
     include $redmine::my_class
@@ -202,14 +195,23 @@ class redmine (
     include redmine::dependencies
   }
 
-  # TODO instal redmine using puppet::netinstall or vcsrepo if
-  # install_type == source else use package
-  if $install_type == 'source' {
-    puppi::netinstall { 'redmine':
-      url             => "${install_url_base}/redmine-${version}.tar.gz",
-      destination_dir => $install_dir,
-      owner           => $owner,
-      group           => $group,
+  case $install_type {
+    'source': {
+      puppi::netinstall { 'redmine':
+        url             => "${install_url_base}/redmine-${version}.tar.gz",
+        destination_dir => $install_dir,
+        owner           => $owner,
+        group           => $group,
+      }
+    }
+    'package': {
+      package { $redmine::package:
+        ensure => $redmine::manage_package,
+        noop   => $redmine::bool_noops,
+      }
+    }
+    default {
+      fail("Unsupported install type: ${install_type}")
     }
   }
 

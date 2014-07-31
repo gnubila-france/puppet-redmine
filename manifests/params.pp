@@ -50,9 +50,8 @@ class redmine::params {
   $owner = 'www-data'
   $group = 'www-data'
   $install_dir = '/usr/local/lib'
-  $install_type = 'source'
+  $install_type = 'package'
   $install_url_base = 'http://www.redmine.org/releases'
-  $version = "2.5.2"
   $dependencies = false
 
   # General Settings
