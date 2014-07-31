@@ -99,7 +99,6 @@ class redmine (
   $version             = params_lookup( 'version' ),
   $owner               = params_lookup( 'owner' ),
   $group               = params_lookup( 'group' ),
-  $dependencies        = params_lookup( 'dependencies' ),
   $my_class            = params_lookup( 'my_class' ),
   $source              = params_lookup( 'source' ),
   $source_dir          = params_lookup( 'source_dir' ),
@@ -244,9 +243,7 @@ class redmine (
     include $redmine::my_class
   }
 
-  if $redmine::dependencies {
-    include redmine::dependencies
-  }
+  include redmine::dependencies
 
   # Setup database
   include "redmine::${redmine::db_type}"

@@ -28,7 +28,6 @@ class redmine::params {
   $install_dir = '/usr/local/lib'
   $install_type = 'package'
   $install_url_base = 'http://www.redmine.org/releases'
-  $dependencies = false
 
   $package = $::operatingsystem ? {
     default => 'redmine',
