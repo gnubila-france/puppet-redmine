@@ -23,7 +23,7 @@ class redmine::params {
   $db_host = 'localhost'
   $webserver_type = undef
   $vhost_template = ''
-  $ruby_version = '1.9.3',
+  $ruby_version = '1.9.3'
   $owner = 'redmine'
   $group = 'redmine'
   $install_dir = '/home/redmine'
