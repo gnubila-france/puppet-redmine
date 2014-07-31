@@ -123,6 +123,8 @@ class redmine (
   $bool_audit_only=any2bool($audit_only)
   $bool_noops=any2bool($noops)
 
+  validate_re($install_type, ['^source$', '^package$'])
+
   ### Definition of some variables used in the module
   $manage_package = $redmine::bool_absent ? {
     true  => 'absent',
@@ -154,6 +156,11 @@ class redmine (
     default   => template($redmine::template),
   }
 
+  $fileconf_require = $redmine::install_type ? {
+    'source'  => Puppi::Netinstall['redmine'],
+    'package' => Package[$redmine::package],
+  }
+
   ### Managed resources
   file { 'redmine.conf':
     ensure  => $redmine::manage_file,
@@ -161,7 +168,7 @@ class redmine (
     mode    => $redmine::config_file_mode,
     owner   => $redmine::config_file_owner,
     group   => $redmine::config_file_group,
-    require => Package[$redmine::package],
+    require => $redmiune::fileconf_require,,
     source  => $redmine::manage_file_source,
     content => $redmine::manage_file_content,
     replace => $redmine::manage_file_replace,
@@ -191,17 +198,18 @@ class redmine (
   }
 
   # TODO install deps if needed/asked (ruby, ...)
-  if $dependencies {
+  if $redmine::dependencies {
     include redmine::dependencies
   }
 
-  case $install_type {
+  case $redmine::install_type {
     'source': {
+      $url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
       puppi::netinstall { 'redmine':
-        url             => "${install_url_base}/redmine-${version}.tar.gz",
-        destination_dir => $install_dir,
-        owner           => $owner,
-        group           => $group,
+        url             => $url,
+        destination_dir => $redmine::install_dir,
+        owner           => $redmine::owner,
+        group           => $redmine::group,
       }
     }
     'package': {
@@ -210,19 +218,17 @@ class redmine (
         noop   => $redmine::bool_noops,
       }
     }
-    default: {
-      fail("Unsupported install type: ${install_type}")
-    }
   }
 
   # Setup database
-  include "redmine::${db_type}"
+  include "redmine::${redmine::db_type}"
 
   # Setup webserver
-  if $webserver_type != undef {
-    include "redmine::${webserver_type}"
+  if $redmine::webserver_type != undef {
+    include "redmine::${redmine::webserver_type}"
 
-    Class["::redmine::${db_type}"]->Class["::redmine::${webserver_type}"]
+    Class["::redmine::${redmine::db_type}"]->
+    Class["::redmine::${redmine::webserver_type}"]
   }
 }
 
