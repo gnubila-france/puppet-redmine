@@ -18,7 +18,7 @@ class redmine::dependencies {
   if $redmine::manage_package {
     rbenv::install { $redmine::owner:
       home    => $redmine::install_dir,
-      require => User[$user],
+      require => User[$redmine::owner],
     }
 
     rbenv::compile { "${redmine::owner}/${redmine::ruby_version}":
