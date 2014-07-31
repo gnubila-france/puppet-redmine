@@ -166,6 +166,12 @@ class redmine (
         owner           => $redmine::owner,
         group           => $redmine::group,
       }
+      file { 'redmine_link':
+        ensure  => 'link',
+        target  => "${redmine::install_dir}/redmine-${redmine::version}",
+        path    => "${redmine::install_dir}/redmine",
+        require => Puppi::Netinstall['redmine'],
+      }
     }
     'package': {
       package { $redmine::package:
@@ -176,7 +182,7 @@ class redmine (
   }
 
   $fileconf_require = $redmine::install_type ? {
-    'source'  => Puppi::Netinstall['redmine'],
+    'source'  => File['redmine_link'],
     'package' => Package[$redmine::package],
   }
 
