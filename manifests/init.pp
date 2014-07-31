@@ -156,6 +156,24 @@ class redmine (
     default   => template($redmine::template),
   }
 
+  case $redmine::install_type {
+    'source': {
+      $url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
+      puppi::netinstall { 'redmine':
+        url             => $url,
+        destination_dir => $redmine::install_dir,
+        owner           => $redmine::owner,
+        group           => $redmine::group,
+      }
+    }
+    'package': {
+      package { $redmine::package:
+        ensure => $redmine::manage_package,
+        noop   => $redmine::bool_noops,
+      }
+    }
+  }
+
   $fileconf_require = $redmine::install_type ? {
     'source'  => Puppi::Netinstall['redmine'],
     'package' => Package[$redmine::package],
@@ -181,7 +199,7 @@ class redmine (
     file { 'redmine.dir':
       ensure  => directory,
       path    => $redmine::config_dir,
-      require => Package[$redmine::package],
+      require => $redmine::fileconf_require,
       source  => $redmine::source_dir,
       recurse => true,
       purge   => $redmine::bool_source_dir_purge,
@@ -200,24 +218,6 @@ class redmine (
   # TODO install deps if needed/asked (ruby, ...)
   if $redmine::dependencies {
     include redmine::dependencies
-  }
-
-  case $redmine::install_type {
-    'source': {
-      $url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
-      puppi::netinstall { 'redmine':
-        url             => $url,
-        destination_dir => $redmine::install_dir,
-        owner           => $redmine::owner,
-        group           => $redmine::group,
-      }
-    }
-    'package': {
-      package { $redmine::package:
-        ensure => $redmine::manage_package,
-        noop   => $redmine::bool_noops,
-      }
-    }
   }
 
   # Setup database
