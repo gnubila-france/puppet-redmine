@@ -210,7 +210,7 @@ class redmine (
         noop   => $redmine::bool_noops,
       }
     }
-    default {
+    default: {
       fail("Unsupported install type: ${install_type}")
     }
   }
