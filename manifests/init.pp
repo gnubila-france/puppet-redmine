@@ -159,9 +159,9 @@ class redmine (
   ### Managed resources
   case $redmine::install_type {
     'source': {
-      $url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
+      $src_url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
       puppi::netinstall { 'redmine':
-        url             => $url,
+        url             => $src_url,
         destination_dir => $redmine::install_dir,
         owner           => $redmine::owner,
         group           => $redmine::group,

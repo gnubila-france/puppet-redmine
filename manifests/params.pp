@@ -23,8 +23,8 @@ class redmine::params {
   $db_host = 'localhost'
   $webserver_type = undef
   $vhost_template = ''
-  $owner = 'www-data'
-  $group = 'www-data'
+  $owner = 'root'
+  $group = 'root'
   $install_dir = '/usr/local/lib'
   $install_type = 'package'
   $install_url_base = 'http://www.redmine.org/releases'
