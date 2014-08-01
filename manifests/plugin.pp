@@ -26,8 +26,8 @@ define redmine::plugin (
   ]
   exec { "Install gems using bundler for plugin ${title}":
     command     => 'bundle install --without development test',
-    user        => $redmine::owner,
-    cwd         => "${redmine_home}/plugins/${title}"
+    user        => $user,
+    cwd         => "${redmine_home}/plugins/${title}",
     path        => $path,
     refreshonly => true,
     notify      => Exec["Run database migration for plugin ${title}"],
@@ -35,7 +35,7 @@ define redmine::plugin (
 
   exec { "Run database migration for plugin ${title}":
     command     => 'bundle exec rake redmine::plugins::migrate',
-    user        => $redmine::owner,
+    user        => $user,
     cwd         => $redmine_home,
     path        => $path,
     environment => [ "RAILS_ENV=production" ],
