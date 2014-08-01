@@ -250,11 +250,11 @@ class redmine (
     "${redmine::install_dir}/.rbenv/bin",
     '/bin', '/usr/bin', '/usr/sbin'
   ]
-  $redmine_path = "${redmine::install_dir}/redmine" 
+  $redmine_home = "${redmine::install_dir}/redmine"
   exec { 'Update gems environment bundler':
     command     => 'bundle update',
     user        => $redmine::owner,
-    cwd         => $redmine_path,
+    cwd         => $redmine_home,
     path        => $path,
     refreshonly => true,
     notify      => Exec['Install gems using bundler'],
@@ -263,7 +263,7 @@ class redmine (
   exec { 'Install gems using bundler':
     command     => 'bundle install --without development test',
     user        => $redmine::owner,
-    cwd         => $redmine_path,
+    cwd         => $redmine_home,
     path        => $path,
     refreshonly => true,
     notify      => Exec['Generate secret token'],
@@ -272,7 +272,7 @@ class redmine (
   exec { 'Generate secret token':
     command     => 'bundle exec rake generate_secret_token',
     user        => $redmine::owner,
-    cwd         => $redmine_path,
+    cwd         => $redmine_home,
     path        => $path,
     refreshonly => true,
     notify      => Exec['Run database migration'],
@@ -281,7 +281,7 @@ class redmine (
   exec { 'Run database migration':
     command     => 'bundle exec rake db:migrate',
     user        => $redmine::owner,
-    cwd         => $redmine_path,
+    cwd         => $redmine_home,
     path        => $path,
     environment => [ "RAILS_ENV=production" ],
     refreshonly => true,
@@ -290,7 +290,7 @@ class redmine (
   exec { 'Insert default data set':
     command     => 'bundle exec rake redmine::load_default_data',
     user        => $redmine::owner,
-    cwd         => $redmine_path,
+    cwd         => $redmine_home,
     path        => $path,
     environment => [ "RAILS_ENV=production", "REDMINE_LANG=en" ],
     refreshonly => true,

@@ -24,7 +24,7 @@ define redmine::plugin (
   exec { "Run database migration for plugin ${title}":
     command     => 'bundle exec rake redmine::plugins::migrate',
     user        => $redmine::owner,
-    cwd         => $redmine_path,
+    cwd         => $redmine_home,
     path        => $path,
     environment => [ "RAILS_ENV=production" ],
     refreshonly => true,
