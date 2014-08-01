@@ -46,7 +46,7 @@ define redmine::plugin (
   }
 
   exec { "Run database migration for plugin ${title}":
-    command     => 'bundle exec rake redmine::plugins::migrate',
+    command     => 'bundle exec rake redmine:plugins:migrate',
     user        => $user,
     cwd         => $redmine_home,
     path        => $path,
