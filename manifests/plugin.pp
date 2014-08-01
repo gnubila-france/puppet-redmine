@@ -7,6 +7,8 @@ define redmine::plugin (
   $revision = 'master',
   $provider = 'git',
 ) {
+  include ::redmine
+
   if $repo_url == undef {
     fail('Please provide rep_url.')
   }
