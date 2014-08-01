@@ -7,7 +7,7 @@ define redmine::plugin (
   $revision = 'master',
   $provider = 'git',
 ) {
-  require ::redmine
+  include ::redmine
 
   if $repo_url == undef {
     fail('Please provide rep_url.')
@@ -19,6 +19,7 @@ define redmine::plugin (
     revision => $revision,
     user     => $user,
     notify   => Exec["Update gems environment using bundler for plugin ${title}"],
+    require  => File['redmine_link'],
   }
 
   $path = [
@@ -33,6 +34,7 @@ define redmine::plugin (
     path        => $path,
     refreshonly => true,
     notify      => Exec["Install gems using bundler for plugin ${title}"],
+    require     => Exec['Install gems using bundler'],
   }
   exec { "Install gems using bundler for plugin ${title}":
     command     => 'bundle install --without development test',
