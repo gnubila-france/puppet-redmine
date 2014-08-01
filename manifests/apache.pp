@@ -21,9 +21,7 @@ class redmine::apache(
   #  template    => 'site/apache/vhost_redirect_ssl.erb',
   #}
 
-  file { [$redmine_home,
-          "${redmine_home}/public",
-          "${redmine_home}/tmp"]:
+  file { [ "${redmine_home}/public", "${redmine_home}/tmp" ]:
     ensure => 'directory',
     owner  => $user,
     group  => $group,
