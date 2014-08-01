@@ -46,6 +46,34 @@ class redmine::dependencies {
     cwd         => $redmine_path,
     path        => $path,
     refreshonly => true,
+    notify      => Exec['Generate secret token'],
+  }
+
+  exec { 'Generate secret token':
+    command     => 'bundle exec rake generate_secret_token',
+    user        => $redmine::owner,
+    cwd         => $redmine_path,
+    path        => $path,
+    refreshonly => true,
+    notify      => Exec['Run database migration'],
+  }
+
+  exec { 'Run database migration':
+    command     => 'bundle exec rake db:migrate',
+    user        => $redmine::owner,
+    cwd         => $redmine_path,
+    path        => $path,
+    environment => [ "RAILS_ENV=production" ],
+    refreshonly => true,
+  }
+
+  exec { 'Insert default data set':
+    command     => 'bundle exec rake redmine::load_default_data',
+    user        => $redmine::owner,
+    cwd         => $redmine_path,
+    path        => $path,
+    environment => [ "RAILS_ENV=production", "REDMINE_LANG=en" ],
+    refreshonly => true,
   }
 }
 
