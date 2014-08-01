@@ -17,6 +17,7 @@ class redmine::params {
   ### Application related parameters
 
   $db_type = 'mysql'
+  $db_adapter = 'mysql2'
   $db_name = 'redmine'
   $db_user = 'redmine'
   $db_password = 'redmine'

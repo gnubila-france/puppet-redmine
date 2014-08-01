@@ -85,6 +85,7 @@
 #
 class redmine (
   $db_type             = params_lookup( 'db_type' ),
+  $db_adapter          = params_lookup( 'db_adapter' ),
   $db_name             = params_lookup( 'db_name' ),
   $db_user             = params_lookup( 'db_user' ),
   $db_password         = params_lookup( 'db_password' ),
@@ -150,8 +151,8 @@ class redmine (
   }
 
   $db_adapter = $redmine::db_type ? {
-    'mysql' => 'mysql2',
-    default => $redmine::db_type,
+    /^mysql/ => 'mysql2',
+    default  => $redmine::db_type,
   }
 
   ### Managed resources
