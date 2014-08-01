@@ -177,18 +177,13 @@ class redmine (
     require => Puppi::Netinstall['redmine'],
   }
 
-  $fileconf_require = $redmine::install_type ? {
-    'source'  => File['redmine_link'],
-    'package' => Package[$redmine::package],
-  }
-
   file { 'redmine.conf':
     ensure  => $redmine::manage_file,
     path    => $redmine::config_file,
     mode    => $redmine::config_file_mode,
     owner   => $redmine::config_file_owner,
     group   => $redmine::config_file_group,
-    require => $redmine::fileconf_require,
+    require => File['redmine_link'],
     content => $redmine::manage_file_content,
     replace => $redmine::manage_file_replace,
     audit   => $redmine::manage_audit,
@@ -201,7 +196,7 @@ class redmine (
     mode    => $redmine::config_file_mode,
     owner   => $redmine::config_file_owner,
     group   => $redmine::config_file_group,
-    require => $redmine::fileconf_require,
+    require => File['redmine_link'],
     content => $redmine::manage_db_file_content,
     replace => $redmine::manage_file_replace,
     audit   => $redmine::manage_audit,
@@ -213,7 +208,7 @@ class redmine (
     file { 'redmine.dir':
       ensure  => directory,
       path    => $redmine::config_dir,
-      require => $redmine::fileconf_require,
+      require => File['redmine_link'],
       source  => $redmine::source_dir,
       recurse => true,
       purge   => $redmine::bool_source_dir_purge,
