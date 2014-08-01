@@ -43,6 +43,7 @@ define redmine::plugin (
     path        => $path,
     refreshonly => true,
     notify      => Exec["Run database migration for plugin ${title}"],
+    require     => Exec['Install gems using bundler'],
   }
 
   exec { "Run database migration for plugin ${title}":
@@ -52,6 +53,7 @@ define redmine::plugin (
     path        => $path,
     environment => [ "RAILS_ENV=production" ],
     refreshonly => true,
+    require     => Exec['Run database migration'],
   }
 }
 
