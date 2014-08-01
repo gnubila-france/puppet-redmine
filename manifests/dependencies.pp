@@ -2,8 +2,11 @@ class redmine::dependencies {
   package { 'imagemagick':
     ensure => 'present',
   }
+  package { 'libmagickwand-dev':
+    ensure => 'present',
+  }
   if $redmine::db_type == 'mysql' {
-    package { 'ruby-mysql2':
+    package { 'libmysqlclient-dev':
       ensure => 'present',
     }
   }
