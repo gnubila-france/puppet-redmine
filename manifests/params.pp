@@ -31,6 +31,7 @@ class redmine::params {
   $install_deps = true
   $smtp_domain = 'example.net'
   $smtp_server = 'localhost'
+  $plugins = undef
 
   $install_url_base = 'http://www.redmine.org/releases'
 

@@ -96,6 +96,7 @@ class redmine (
   $install_deps        = params_lookup( 'install_deps' ),
   $smtp_domain         = params_lookup( 'smtp_domain' ),
   $smtp_server         = params_lookup( 'smtp_server' ),
+  $plugins             = params_lookup( 'plugins' ),
   $version             = params_lookup( 'version' ),
   $owner               = params_lookup( 'owner' ),
   $group               = params_lookup( 'group' ),
@@ -301,6 +302,10 @@ class redmine (
 
     Class["::redmine::${redmine::db_type}"]->
     Class["::redmine::${redmine::webserver_type}"]
+  }
+
+  if $redmine::plugins != undef and is_hash($redmine::plugins) {
+    create_resource("::redmine::plugin", $redmine::plugins)
   }
 }
 
