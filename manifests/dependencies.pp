@@ -1,15 +1,15 @@
 class redmine::dependencies {
   package { 'imagemagick':
-    ensure => $redmine::manage_package,
+    ensure => 'present',
   }
   if $redmine::db_type == 'mysql' {
     package { 'ruby-mysql2':
-      ensure => $redmine::manage_package,
+      ensure => 'present',
     }
   }
 
   user { $redmine::owner:
-    ensure     => $redmine::manage_package,
+    ensure     => 'present',
     home       => $redmine::install_dir,
     managehome => true,
     shell      => "/bin/bash",
