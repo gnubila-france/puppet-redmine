@@ -43,6 +43,7 @@ class redmine::dependencies {
     cwd         => $redmine_path,
     path        => $path,
     refreshonly => true,
+    require     => File['redmine-database.conf'],
   }
 }
 
