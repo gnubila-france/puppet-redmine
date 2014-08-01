@@ -18,7 +18,7 @@ define redmine::plugin (
     source   => $repo_url,
     revision => $revision,
     user     => $user,
-    notify   => Exec["Install gems environment using bundler for plugin ${title}"],
+    notify   => Exec["Update gems environment using bundler for plugin ${title}"],
   }
 
   $path = [
