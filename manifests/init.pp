@@ -93,6 +93,8 @@ class redmine (
   $webserver_type      = params_lookup( 'webserver_type' ),
   $vhost_template      = params_lookup( 'vhost_template' ),
   $install_dir         = params_lookup( 'install_dir' ),
+  $smtp_domain         = params_lookup( 'smtp_domain' ),
+  $smtp_server         = params_lookup( 'smtp_server' ),
   $version             = params_lookup( 'version' ),
   $owner               = params_lookup( 'owner' ),
   $group               = params_lookup( 'group' ),

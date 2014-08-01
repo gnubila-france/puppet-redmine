@@ -28,6 +28,9 @@ class redmine::params {
   $owner = 'redmine'
   $group = 'redmine'
   $install_dir = '/home/redmine'
+  $smtp_domain = 'example.net'
+  $smtp_server = 'localhost'
+
   $install_url_base = 'http://www.redmine.org/releases'
 
   $config_file_mode = $::operatingsystem ? {
