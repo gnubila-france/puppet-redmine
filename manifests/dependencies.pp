@@ -35,6 +35,7 @@ class redmine::dependencies {
     path        => $path,
     refreshonly => true,
     notify      => Exec['Install gems using bundler'],
+    require     => File['redmine-database.conf'],
   }
   exec { 'Install gems using bundler':
     command     => 'bundle install --without development test',
