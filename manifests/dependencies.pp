@@ -10,6 +10,7 @@ class redmine::dependencies {
       package { 'libmysqlclient-dev':
         ensure => 'present',
       }
+    }
     'pgsql': {
       package { 'libpq-dev':
         ensure => 'present',
