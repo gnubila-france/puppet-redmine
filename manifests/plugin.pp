@@ -12,7 +12,7 @@ define redmine::plugin (
   if $repo_url == undef {
     fail('Please provide rep_url.')
   }
-  vcsrepo { "${redmine_home}/${title}":
+  vcsrepo { "${redmine_home}/plugins/${title}":
     ensure   => 'present',
     provider => $provider,
     source   => $repo_url,
