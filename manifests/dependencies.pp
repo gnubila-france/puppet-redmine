@@ -17,6 +17,21 @@ class redmine::dependencies {
       }
     }
   }
+
+  if $redmine::webserver_type == 'apache' {
+    package { 'libcurl4-openssl-dev':
+      ensure => 'present',
+    }
+    package { 'apache2-threaded-dev':
+      ensure => 'present',
+    }
+    package { 'libapr1-dev':
+      ensure => 'present',
+    }
+    package { 'libaprutil1-dev':
+      ensure => 'present',
+    }
+  }
 }
 
 # vim: set et sw=2:

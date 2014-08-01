@@ -21,6 +21,16 @@ class redmine::apache(
   #  template    => 'site/apache/vhost_redirect_ssl.erb',
   #}
 
+  exec { 'gem install passenger --no-ri --no-rdoc':
+    user   => $user,
+    unless => 'gem list passenger | grep -q \'^passenger \'',
+    notify => Exec['passenger-install-apache2-module -a'],
+  }
+  exec { 'passenger-install-apache2-module -a':
+    user        => $user,
+    refreshonly => true,
+  }
+
   file { [ "${redmine_home}/public", "${redmine_home}/tmp" ]:
     ensure => 'directory',
     owner  => $user,
