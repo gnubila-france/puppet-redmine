@@ -33,7 +33,6 @@ class redmine::dependencies {
     user        => $redmine::owner,
     cwd         => $redmine_path,
     path        => $path,
-    onlyif      => "[ -e '${redmine_path}/Gemfile.lock' ]",
     refreshonly => true,
     notify      => Exec['Install gems using bundler'],
   }
