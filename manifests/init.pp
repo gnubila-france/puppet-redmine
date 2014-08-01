@@ -93,6 +93,7 @@ class redmine (
   $webserver_type      = params_lookup( 'webserver_type' ),
   $vhost_template      = params_lookup( 'vhost_template' ),
   $install_dir         = params_lookup( 'install_dir' ),
+  $install_deps        = params_lookup( 'install_deps' ),
   $smtp_domain         = params_lookup( 'smtp_domain' ),
   $smtp_server         = params_lookup( 'smtp_server' ),
   $version             = params_lookup( 'version' ),
@@ -222,10 +223,77 @@ class redmine (
     include $redmine::my_class
   }
 
-  include redmine::dependencies
+  if $redmine::install_deps {
+    include redmine::dependencies
+  }
 
   # Setup database
   include "redmine::${redmine::db_type}"
+
+  rbenv::install { $redmine::owner:
+    home    => $redmine::install_dir,
+    require => User[$redmine::owner],
+  }
+
+  rbenv::compile { "${redmine::owner}/${redmine::ruby_version}":
+    user    => $redmine::owner,
+    home    => $redmine::install_dir,
+    ruby    => $redmine::ruby_version,
+    global  => true,
+    require => Rbenv::Install[$redmine::owner],
+    notify  => Exec['Update gems environment bundler'],
+  }
+
+  $path = [ 
+    "${redmine::install_dir}/.rbenv/shims",
+    "${redmine::install_dir}/.rbenv/bin",
+    '/bin', '/usr/bin', '/usr/sbin'
+  ]
+  $redmine_path = "${redmine::install_dir}/redmine" 
+  exec { 'Update gems environment bundler':
+    command     => 'bundle update',
+    user        => $redmine::owner,
+    cwd         => $redmine_path,
+    path        => $path,
+    refreshonly => true,
+    notify      => Exec['Install gems using bundler'],
+    require     => File['redmine-database.conf'],
+  }
+  exec { 'Install gems using bundler':
+    command     => 'bundle install --without development test',
+    user        => $redmine::owner,
+    cwd         => $redmine_path,
+    path        => $path,
+    refreshonly => true,
+    notify      => Exec['Generate secret token'],
+  }
+
+  exec { 'Generate secret token':
+    command     => 'bundle exec rake generate_secret_token',
+    user        => $redmine::owner,
+    cwd         => $redmine_path,
+    path        => $path,
+    refreshonly => true,
+    notify      => Exec['Run database migration'],
+  }
+
+  exec { 'Run database migration':
+    command     => 'bundle exec rake db:migrate',
+    user        => $redmine::owner,
+    cwd         => $redmine_path,
+    path        => $path,
+    environment => [ "RAILS_ENV=production" ],
+    refreshonly => true,
+  }
+
+  exec { 'Insert default data set':
+    command     => 'bundle exec rake redmine::load_default_data',
+    user        => $redmine::owner,
+    cwd         => $redmine_path,
+    path        => $path,
+    environment => [ "RAILS_ENV=production", "REDMINE_LANG=en" ],
+    refreshonly => true,
+  }
 
   # Setup webserver
   if $redmine::webserver_type != undef {

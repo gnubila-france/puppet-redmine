@@ -28,6 +28,7 @@ class redmine::params {
   $owner = 'redmine'
   $group = 'redmine'
   $install_dir = '/home/redmine'
+  $install_deps = true
   $smtp_domain = 'example.net'
   $smtp_server = 'localhost'
 
