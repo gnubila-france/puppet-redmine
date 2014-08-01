@@ -305,7 +305,7 @@ class redmine (
   }
 
   if $redmine::plugins != undef and is_hash($redmine::plugins) {
-    create_resource("::redmine::plugin", $redmine::plugins)
+    create_resources("::redmine::plugin", $redmine::plugins)
   }
 }
 
