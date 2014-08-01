@@ -150,11 +150,6 @@ class redmine (
     default   => template($redmine::db_template),
   }
 
-  $db_adapter = $redmine::db_type ? {
-    /^mysql/ => 'mysql2',
-    default  => $redmine::db_type,
-  }
-
   ### Managed resources
   user { $redmine::owner:
     ensure     => 'present',
