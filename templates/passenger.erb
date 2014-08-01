@@ -1,6 +1,8 @@
 # File Managed by Puppet
 
 <VirtualHost *:80>
+        PassengerRoot <%= @install_dir %>
+        PassengerRuby <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>
         # you probably want to tune these settings
         PassengerHighPerformance on
         PassengerMaxPoolSize 12
