@@ -5,9 +5,15 @@ class redmine::dependencies {
   package { 'libmagickwand-dev':
     ensure => 'present',
   }
-  if $redmine::db_type == 'mysql' {
-    package { 'libmysqlclient-dev':
-      ensure => 'present',
+  case $redmine::db_type {
+    /^mysql/: {
+      package { 'libmysqlclient-dev':
+        ensure => 'present',
+      }
+    'pgsql': {
+      package { 'libpq-dev':
+        ensure => 'present',
+      }
     }
   }
 
