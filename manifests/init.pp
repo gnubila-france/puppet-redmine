@@ -68,9 +68,6 @@
 # Set and override them only if you know what you're doing.
 # Note also that you can't override/set them via top scope variables.
 #
-# [*package*]
-#   The name of redmine package
-#
 # [*config_dir*]
 #   Main configuration directory. Used by puppi
 #
@@ -95,7 +92,6 @@ class redmine (
   $webserver_type      = params_lookup( 'webserver_type' ),
   $vhost_template      = params_lookup( 'vhost_template' ),
   $install_dir         = params_lookup( 'install_dir' ),
-  $install_type        = params_lookup( 'install_type' ),
   $version             = params_lookup( 'version' ),
   $owner               = params_lookup( 'owner' ),
   $group               = params_lookup( 'group' ),
@@ -109,7 +105,6 @@ class redmine (
   $absent              = params_lookup( 'absent' ),
   $audit_only          = params_lookup( 'audit_only' , 'global' ),
   $noops               = params_lookup( 'noops' ),
-  $package             = params_lookup( 'package' ),
   $config_dir          = params_lookup( 'config_dir' ),
   $config_file         = params_lookup( 'config_file' )
   ) inherits redmine::params {
@@ -123,14 +118,7 @@ class redmine (
   $bool_audit_only=any2bool($audit_only)
   $bool_noops=any2bool($noops)
 
-  validate_re($install_type, ['^source$', '^package$'])
-
   ### Definition of some variables used in the module
-  $manage_package = $redmine::bool_absent ? {
-    true  => 'absent',
-    false => $redmine::version,
-  }
-
   $manage_file = $redmine::bool_absent ? {
     true    => 'absent',
     default => 'present',
@@ -167,28 +155,26 @@ class redmine (
   }
 
   ### Managed resources
-  case $redmine::install_type {
-    'source': {
-      $src_url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
-      puppi::netinstall { 'redmine':
-        url             => $src_url,
-        destination_dir => $redmine::install_dir,
-        owner           => $redmine::owner,
-        group           => $redmine::group,
-      }
-      file { 'redmine_link':
-        ensure  => 'link',
-        target  => "${redmine::install_dir}/redmine-${redmine::version}",
-        path    => "${redmine::install_dir}/redmine",
-        require => Puppi::Netinstall['redmine'],
-      }
-    }
-    'package': {
-      package { $redmine::package:
-        ensure => $redmine::manage_package,
-        noop   => $redmine::bool_noops,
-      }
-    }
+  user { $redmine::owner:
+    ensure     => 'present',
+    home       => $redmine::install_dir,
+    managehome => true,
+    shell      => "/bin/bash",
+  }
+
+  $src_url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
+  puppi::netinstall { 'redmine':
+    url             => $src_url,
+    destination_dir => $redmine::install_dir,
+    owner           => $redmine::owner,
+    group           => $redmine::group,
+    require         => User[$redmine::owner],
+  }
+  file { 'redmine_link':
+    ensure  => 'link',
+    target  => "${redmine::install_dir}/redmine-${redmine::version}",
+    path    => "${redmine::install_dir}/redmine",
+    require => Puppi::Netinstall['redmine'],
   }
 
   $fileconf_require = $redmine::install_type ? {

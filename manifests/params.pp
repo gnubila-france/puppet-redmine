@@ -27,12 +27,7 @@ class redmine::params {
   $owner = 'redmine'
   $group = 'redmine'
   $install_dir = '/home/redmine'
-  $install_type = 'package'
   $install_url_base = 'http://www.redmine.org/releases'
-
-  $package = $::operatingsystem ? {
-    default => 'redmine',
-  }
 
   $config_file_mode = $::operatingsystem ? {
     default => '0644',
@@ -70,5 +65,4 @@ class redmine::params {
   $absent = false
   $audit_only = false
   $noops = false
-
 }
