@@ -19,7 +19,7 @@ class redmine::dependencies {
     ruby    => $redmine::ruby_version,
     global  => true,
     require => Rbenv::Install[$redmine::owner],
-    notify  => Exec['Update gems list using bundler'],
+    notify  => Exec['Update gems environment bundler'],
   }
 
   $path = [ 
@@ -28,14 +28,14 @@ class redmine::dependencies {
     '/bin', '/usr/bin', '/usr/sbin'
   ]
   $redmine_path = "${redmine::install_dir}/redmine" 
-  exec { 'Update gems list using bundler':
+  exec { 'Update gems environment bundler':
     command     => 'bundle update',
     user        => $redmine::owner,
     cwd         => $redmine_path,
     path        => $path,
     onlyif      => "[ -e '${redmine_path}/Gemfile.lock' ]",
     refreshonly => true,
-    require     => Rbenv::Compile["${redmine::owner}/${redmine::ruby_version}"],
+    notify      => Exec['Install gems using bundler'],
   }
   exec { 'Install gems using bundler':
     command     => 'bundle install --without development test',
@@ -43,7 +43,6 @@ class redmine::dependencies {
     cwd         => $redmine_path,
     path        => $path,
     refreshonly => true,
-    require     => Rbenv::Compile["${redmine::owner}/${redmine::ruby_version}"],
   }
 }
 
