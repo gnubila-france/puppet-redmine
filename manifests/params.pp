@@ -32,6 +32,7 @@ class redmine::params {
   $smtp_domain = 'example.net'
   $smtp_server = 'localhost'
   $plugins = undef
+  $template_passenger = 'redmine/passenger.erb'
 
   $install_url_base = 'http://www.redmine.org/releases'
 
