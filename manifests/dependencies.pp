@@ -27,7 +27,7 @@ class redmine::dependencies {
       ruby    => $redmine::ruby_version,
       global  => true,
       require => Rbenv::Install[$redmine::owner],
-      notify  => Exec['Update gems using bundler'],
+      notify  => Exec['Update gems list using bundler'],
     }
 
     $path = [ 
