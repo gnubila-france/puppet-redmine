@@ -4,7 +4,8 @@ class redmine::apache(
   $redmine_home = "${redmine::install_dir}/redmine",
   $template_passenger = params_lookup( 'template_passenger' ),
 ) inherits redmine::params {
-  include apache::passenger
+  include ::redmine
+  include ::apache::passenger
 
   # SSL setup to be done
   #include apache::ssl
@@ -42,7 +43,7 @@ class redmine::apache(
     docroot  => $rack_location,
     ssl      => true,
     template => $redmine::template_passenger,
-    require  => Exec['redminemaster-ca-generate'],
+    require  => File['redmine_link']
   }
 }
 
