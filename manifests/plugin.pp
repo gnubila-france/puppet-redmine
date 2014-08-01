@@ -18,7 +18,21 @@ define redmine::plugin (
     source   => $repo_url,
     revision => $revision,
     user     => $user,
-    notify   => Exec["Run database migration for plugin ${title}"],
+    notify   => Exec["Install gems using bundler for plugin ${title}"],
+  }
+
+  $path = [
+    "${redmine::install_dir}/.rbenv/shims",
+    "${redmine::install_dir}/.rbenv/bin",
+    '/bin', '/usr/bin', '/usr/sbin'
+  ]
+  exec { "Install gems using bundler for plugin ${title}":
+    command     => 'bundle install --without development test',
+    user        => $redmine::owner,
+    cwd         => "${redmine_home}/plugins/${title}"
+    path        => $path,
+    refreshonly => true,
+    notify      => Exec["Run database migration for plugin ${title}"],
   }
 
   exec { "Run database migration for plugin ${title}":
