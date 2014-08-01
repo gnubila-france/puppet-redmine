@@ -41,7 +41,7 @@ class redmine::apache(
     priority => $vhost_priority,
     docroot  => $rack_location,
     ssl      => true,
-    template => template($redmine::template_passenger),
+    template => $redmine::template_passenger,
     require  => Exec['redminemaster-ca-generate'],
   }
 }
