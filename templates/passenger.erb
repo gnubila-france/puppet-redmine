@@ -1,0 +1,35 @@
+# File Managed by Puppet
+
+<VirtualHost *:80>
+        # you probably want to tune these settings
+        PassengerHighPerformance on
+        PassengerMaxPoolSize 12
+        PassengerPoolIdleTime 1500
+        # PassengerMaxRequests 1000
+        PassengerStatThrottleRate 120
+        RackAutoDetect On
+        RailsAutoDetect Off
+
+#        SSLEngine on
+#        SSLProtocol -ALL +SSLv3 +TLSv1
+#        SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP
+#        SSLCertificateFile /etc/ssl/certs/<%= scope.lookupvar('hostname') %>.pem
+#        SSLCertificateKeyFile /etc/ssl/private/<%= scope.lookupvar('hostname') %>.pem
+#        SSLCertificateChainFile /etc/ssl/certs/ca.pem
+#        SSLCACertificateFile /etc/ssl/certs/ca.pem
+
+        DocumentRoot <%= @docroot %>
+        RackBaseURI /
+        <Directory <%= @docroot %>>
+                Options None
+                AllowOverride None
+                Order allow,deny
+                allow from all
+        </Directory>
+       
+        ErrorLog <%= scope.lookupvar('apache::params::log_dir') %>/<%= @name %>_error.log
+        LogLevel warn
+        CustomLog <%= scope.lookupvar('apache::params::log_dir') %>/<%= @name %>_access.log combined
+        ServerSignature On
+
+</VirtualHost>
