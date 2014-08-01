@@ -23,8 +23,8 @@ class redmine::dependencies {
   }
 
   $path = [ 
-    "${home_path}/.rbenv/shims",
-    "${home_path}/.rbenv/bin",
+    "${redmine::install_dir}/.rbenv/shims",
+    "${redmine::install_dir}/.rbenv/bin",
     '/bin', '/usr/bin', '/usr/sbin'
   ]
   $redmine_path = "${redmine::install_dir}/redmine" 
