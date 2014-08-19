@@ -1,6 +1,6 @@
 # File Managed by Puppet
 NameVirtualHost <%= @server_name %>
-<% if @ssl %>
+<% if scope.lookupvar('redmine::ssl') %>
 <VirtualHost <%= @server_name %>:80>
     # Redirect HTTP to HTTPS
     RewriteEngine On
@@ -9,7 +9,7 @@ NameVirtualHost <%= @server_name %>
     ServerSignature Off
 </VirtualHost>
 <% end -%>
-<% if @ssl %>
+<% if scope.lookupvar('redmine::ssl') %>
 <VirtualHost <%= @server_name %>:443>
 <% else %>
 <VirtualHost <%= @server_name %>:80>
@@ -27,15 +27,15 @@ NameVirtualHost <%= @server_name %>
 
         RailsBaseURI /
 
-        <% if @ssl %>
+        <% if scope.lookupvar('redmine::ssl') %>
         SSLEngine on
-        SSLProtocol <%= @ssl_protocol %>
-        SSLCipherSuite <%= @ssl_cipher_suite %>
-        SSLCertificateFile <%= @ssl_cert %>
-        SSLCertificateKeyFile <%= @ssl_cert_key %>
-        SSLCACertificateFile <%= @ssl_ca_cert %>
-        <% if ! @ssl_ca_cert_chain.nil? and @ssl_ca_cert_chain != '' %>
-        SSLCertificateChainFile <%= @ssl_ca_cert_chain %>
+        SSLProtocol <%= scope.lookupvar('redmine::ssl_protocol') %>
+        SSLCipherSuite <%= scope.lookupvar('redmine::ssl_cipher_suite') %>
+        SSLCertificateFile <%= scope.lookupvar('redmine::ssl_cert') %>
+	SSLCertificateKeyFile <%= scope.lookupvar('redmine::ssl_cert_key') %>
+	SSLCACertificateFile <%= scope.lookupvar('redmine::ssl_ca_cert') %>
+        <% if ! scope.lookupvar('redmine::ssl_ca_cert_chain').nil? and scope.lookupvar('redmine::ssl_ca_cert_chain') != '' %>
+        SSLCertificateChainFile <%= scope.lookupvar('redmine::ssl_ca_cert_chain') %>
         <% end -%>
         <% end -%>
 
