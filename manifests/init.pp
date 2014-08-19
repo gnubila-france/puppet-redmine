@@ -98,6 +98,8 @@ class redmine (
   $smtp_server         = params_lookup( 'smtp_server' ),
   $plugins             = params_lookup( 'plugins' ),
   $version             = params_lookup( 'version' ),
+  $ruby_version        = params_lookup( 'ruby_version' ),
+  $passenger_version   = params_lookup( 'passenger_version' ),
   $owner               = params_lookup( 'owner' ),
   $group               = params_lookup( 'group' ),
   $my_class            = params_lookup( 'my_class' ),

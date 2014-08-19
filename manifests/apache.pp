@@ -21,10 +21,10 @@ class redmine::apache(
   #  template    => 'site/apache/vhost_redirect_ssl.erb',
   #}
 
-  exec { 'bundle exec gem install passenger --no-ri --no-rdoc':
+  exec { "bundle exec gem install passenger --version ${passenger_version} --no-ri --no-rdoc":
     user   => $user,
     cwd    => $redmine_home,
-    unless => 'bundle exec gem list passenger | grep -q \'^passenger \'',
+    unless => "bundle exec gem list passenger | grep -q '^passenger.*${passenger_version}'",
     notify => Exec['passenger-install-apache2-module -a'],
   }
   exec { 'passenger-install-apache2-module -a':

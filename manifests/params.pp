@@ -25,6 +25,7 @@ class redmine::params {
   $webserver_type = undef
   $vhost_template = ''
   $ruby_version = '1.9.3-p547'
+  $passenger_version = '4.0.48'
   $owner = 'redmine'
   $group = 'redmine'
   $install_dir = '/home/redmine'
