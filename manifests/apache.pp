@@ -5,6 +5,7 @@ class redmine::apache(
   $template_passenger = params_lookup( 'template_passenger' ),
 ) inherits redmine::params {
   include ::redmine
+  include ::apache
 
   # SSL setup to be done
   #include apache::ssl
