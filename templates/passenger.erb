@@ -27,14 +27,14 @@ NameVirtualHost <%= @server_name %>
 
         RailsBaseURI /
 
-        <% if @ssl -%>
+        <% if @ssl %>
         SSLEngine on
         SSLProtocol <%= @ssl_protocol %>
         SSLCipherSuite <%= @ssl_cipher_suite %>
         SSLCertificateFile <%= @ssl_cert %>
         SSLCertificateKeyFile <%= @ssl_cert_key %>
         SSLCACertificateFile <%= @ssl_ca_cert %>
-        <% if ! @ssl_ca_cert_chain.nil? and @ssl_ca_cert_chain != '' -%>
+        <% if ! @ssl_ca_cert_chain.nil? and @ssl_ca_cert_chain != '' %>
         SSLCertificateChainFile <%= @ssl_ca_cert_chain %>
         <% end -%>
         <% end -%>
