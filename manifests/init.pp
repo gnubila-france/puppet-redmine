@@ -92,6 +92,7 @@ class redmine (
   $db_host             = params_lookup( 'db_host' ),
   $webserver_type      = params_lookup( 'webserver_type' ),
   $vhost_template      = params_lookup( 'vhost_template' ),
+  $server_name         = params_lookup( 'server_name' ),
   $template_passenger  = params_lookup( 'template_passenger' ),
   $ssl                 = params_lookup( 'ssl' ),
   $ssl_protocol        = params_lookup( 'ssl_protocol' ),

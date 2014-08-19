@@ -93,12 +93,13 @@ class redmine::apache(
 
   $vhost_priority = 10
   $rack_location = "${redmine_home}/public/"
-  apache::vhost { 'redmine':
-    priority => $vhost_priority,
-    docroot  => $rack_location,
-    ssl      => true,
-    template => $redmine::template_passenger,
-    require  => File['redmine_link']
+  apache::vhost { $::redmine::server_name:
+    server_name => $::redmine::server_name,
+    priority    => $vhost_priority,
+    docroot     => $rack_location,
+    ssl         => true,
+    template    => $redmine::template_passenger,
+    require     => File['redmine_link']
   }
 }
 

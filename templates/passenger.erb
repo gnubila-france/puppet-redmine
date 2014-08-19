@@ -1,7 +1,7 @@
 # File Managed by Puppet
-NameVirtualHost <%= @fqdn %>
+NameVirtualHost <%= @server_name %>
 <% if @ssl %>
-<VirtualHost <%= @fqdn %>:80>
+<VirtualHost <%= @server_name %>:80>
     # Redirect HTTP to HTTPS
     RewriteEngine On
     RewriteRule /(.*) https://%{HTTP_HOST}:443/$1 [R=302,NE]
@@ -10,9 +10,9 @@ NameVirtualHost <%= @fqdn %>
 </VirtualHost>
 <% end -%>
 <% if @ssl %>
-<VirtualHost <%= @fqdn %>:443>
+<VirtualHost <%= @server_name %>:443>
 <% else %>
-<VirtualHost <%= @fqdn %>:80>
+<VirtualHost <%= @server_name %>:80>
 <% end -%>
         LoadModule passenger_module <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-<%= @passenger_version %>/buildout/apache2/mod_passenger.so
         PassengerRoot <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-<%= @passenger_version %>
@@ -48,6 +48,6 @@ NameVirtualHost <%= @fqdn %>
         </Directory>
 
         LogLevel warn
-        ErrorLog <%= scope.lookupvar('apache::params::log_dir') %>/<%= @fqdn %>_error.log
-        CustomLog <%= scope.lookupvar('apache::params::log_dir') %>/<%= @fqdn %>_access.log combined
+        ErrorLog <%= scope.lookupvar('apache::params::log_dir') %>/<%= @server_name %>_error.log
+        CustomLog <%= scope.lookupvar('apache::params::log_dir') %>/<%= @server_name %>_access.log combined
 </VirtualHost>
