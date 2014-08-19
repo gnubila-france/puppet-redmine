@@ -8,18 +8,15 @@ class redmine::apache(
   include ::apache
 
   # SSL setup to be done
-  #include apache::ssl
-  # Required for redirection to https
-  #if ! defined(Apache::Module['rewrite']) {
-  # apache::module { 'rewrite':
-  #   ensure => 'present',
-  # }
-  #}
-  # Redirect http to https
-  #apache::vhost { "${::hostname}-80":
-  #  server_name => $::hostname,
-  #  template    => 'site/apache/vhost_redirect_ssl.erb',
-  #}
+  if $::redmine::ssl {
+    include apache::ssl
+    # Required for redirection to https
+    if ! defined(Apache::Module['rewrite']) {
+     apache::module { 'rewrite':
+       ensure => 'present',
+     }
+    }
+  }
 
   $path = [
     "${redmine::install_dir}/.rbenv/shims",

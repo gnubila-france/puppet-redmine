@@ -1,6 +1,19 @@
 # File Managed by Puppet
 NameVirtualHost <%= @fqdn %>
+<% if @ssl %>
 <VirtualHost <%= @fqdn %>:80>
+    # Redirect HTTP to HTTPS
+    RewriteEngine On
+    RewriteRule /(.*) https://%{HTTP_HOST}:443/$1 [R=302,NE]
+
+    ServerSignature Off
+</VirtualHost>
+<% end -%>
+<% if @ssl %>
+<VirtualHost <%= @fqdn %>:443>
+<% else %>
+<VirtualHost <%= @fqdn %>:80>
+<% end -%>
         LoadModule passenger_module <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-<%= @passenger_version %>/buildout/apache2/mod_passenger.so
         PassengerRoot <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-<%= @passenger_version %>
         PassengerDefaultRuby <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/bin/ruby
@@ -14,13 +27,17 @@ NameVirtualHost <%= @fqdn %>
 
         RailsBaseURI /
 
-#        SSLEngine on
-#        SSLProtocol -ALL +SSLv3 +TLSv1
-#        SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP
-#        SSLCertificateFile /etc/ssl/certs/<%= scope.lookupvar('hostname') %>.pem
-#        SSLCertificateKeyFile /etc/ssl/private/<%= scope.lookupvar('hostname') %>.pem
-#        SSLCertificateChainFile /etc/ssl/certs/ca.pem
-#        SSLCACertificateFile /etc/ssl/certs/ca.pem
+        <% if @ssl %>
+        SSLEngine on
+        SSLProtocol <%= @ssl_protocol %>
+        SSLCipherSuite <%= @ssl_cipher_suite %>
+        SSLCertificateFile <%= @ssl_certificate %>
+        SSLCertificateKeyFile <%= @ssl_certificate_key %>
+        SSLCACertificateFile <%= @ssl_ca_certificate %>
+        <% if ! @ssl_ca_certificate_chain.nil? and @ssl_ca_certificate_chain != '' %>
+        SSLCertificateChainFile <%= @ssl_ca_certificate_chain %>
+        <% end -%>
+        <% end -%>
 
         DocumentRoot <%= @docroot %>
         <Directory <%= @docroot %>>
