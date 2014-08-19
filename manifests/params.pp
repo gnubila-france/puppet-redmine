@@ -39,7 +39,7 @@ class redmine::params {
   $ssl_protocol = '-ALL +SSLv3 +TLSv1'
   $ssl_cipher_suite = 'ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP'
   $ssl_cert = "/etc/ssl/certs/${::fqdn}.crt"
-  $ssl_cert_key = "/etc/ssl/certs/${::fqdn}.key"
+  $ssl_cert_key = "/etc/ssl/private/${::fqdn}.key"
   $ssl_ca_cert = '/etc/ssl/certs/startssl.ca.pem'
   $ssl_ca_cert_chain = '/etc/ssl/certs/sub.class1.server.startssl.ca.pem'
   $ssl_cert_src = "puppet:///modules/site/certs/${::fqdn}.crt"
