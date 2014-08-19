@@ -1,6 +1,7 @@
 # File Managed by Puppet
-NameVirtualHost <%= @server_name %>
+NameVirtualHost <%= @server_name %>:80
 <% if scope.lookupvar('redmine::ssl') %>
+NameVirtualHost <%= @server_name %>:443
 <VirtualHost <%= @server_name %>:80>
     # Redirect HTTP to HTTPS
     RewriteEngine On
