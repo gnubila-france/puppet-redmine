@@ -44,8 +44,8 @@ class redmine::params {
   $ssl_ca_cert_chain = '/etc/ssl/certs/sub.class1.server.startssl.ca.pem'
   $ssl_cert_src = "puppet:///modules/site/certs/${server_name}.crt"
   $ssl_cert_key_src = "puppet:///modules/site/certs/${server_name}.key"
-  $ssl_ca_cert_src = 'puppet:///modules/site/certs/startssl.ca.pem'
-  $ssl_ca_cert_chain_src = 'puppet:///modules/site/certs/sub.class1.server.startssl.ca.pem'
+  $ssl_ca_cert_src = 'puppet:///modules/site/certs/startssl-ca.pem'
+  $ssl_ca_cert_chain_src = 'puppet:///modules/site/certs/startssl-sub.class1.server.ca.pem'
 
   $install_url_base = 'http://www.redmine.org/releases'
 
