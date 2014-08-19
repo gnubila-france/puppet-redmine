@@ -28,17 +28,18 @@ NameVirtualHost <%= @server_name %>:443
 
         RailsBaseURI /
 
-        <% if scope.lookupvar('redmine::ssl') %>
+        <%- if scope.lookupvar('redmine::ssl') -%>
         SSLEngine on
         SSLProtocol <%= scope.lookupvar('redmine::ssl_protocol') %>
         SSLCipherSuite <%= scope.lookupvar('redmine::ssl_cipher_suite') %>
         SSLCertificateFile <%= scope.lookupvar('redmine::ssl_cert') %>
         SSLCertificateKeyFile <%= scope.lookupvar('redmine::ssl_cert_key') %>
         SSLCACertificateFile <%= scope.lookupvar('redmine::ssl_ca_cert') %>
-        <% if ! scope.lookupvar('redmine::ssl_ca_cert_chain').nil? and scope.lookupvar('redmine::ssl_ca_cert_chain') != '' %>
+        <%- if ! scope.lookupvar('redmine::ssl_ca_cert_chain').nil? 
+               and scope.lookupvar('redmine::ssl_ca_cert_chain') != '' -%>
         SSLCertificateChainFile <%= scope.lookupvar('redmine::ssl_ca_cert_chain') %>
-        <% end -%>
-        <% end -%>
+        <%- end -%>
+        <%- end -%>
 
         DocumentRoot <%= @docroot %>
         <Directory <%= @docroot %>>
