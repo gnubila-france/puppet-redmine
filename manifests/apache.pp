@@ -16,6 +16,47 @@ class redmine::apache(
        ensure => 'present',
      }
     }
+    file { $::redmine::ssl_certificate:
+      ensure  => 'present',
+      owner   => 'www-data',
+      group   => 'www-data',
+      mode    => '0640',
+      source  => $::redmine::ssl_certificate_src,
+      notify  => Service['apache'],
+      require => [
+        File[$::redmine::ssl_certificate_key],
+        File[$::redmine::ssl_ca_certificate],
+      ]
+    }
+    file { $::redmine::ssl_certificate_key:
+      ensure => 'present',
+      owner  => 'www-data',
+      group  => 'www-data',
+      mode   => '0400',
+      source => $::redmine::ssl_certificate_key_src,
+      notify => Service['apache'],
+    }
+    if ! defined(File[$::redmine::ssl_ca_certificate]) {
+      file { $::redmine::ssl_ca_certificate:
+        ensure  => 'present',
+        owner   => 'www-data',
+        group   => 'www-data',
+        mode    => '0640',
+        source  => $::redmine::ssl_ca_certificate_src,
+        notify  => Service['apache'],
+      }
+    }
+    if $::redmine::ssl_ca_cert_chain != undef and
+      ! defined(File[$::redmine::ssl_ca_cert_chain]) {
+      file { $::redmine::ssl_ca_cert_chain:
+        ensure => 'present',
+        owner  => 'www-data',
+        group  => 'www-data',
+        mode   => '0640',
+        source => $::redmine::ssl_ca_cert_chain_src,
+        notify => Service['apache'],
+      }
+    }
   }
 
   $path = [
