@@ -1,17 +1,18 @@
 # File Managed by Puppet
+NameVirutalHost <%= @fqdn %>
+<VirtualHost <%= @fqdn %>:80>
+        LoadModule passenger_module <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-<%= @passenger_version %>/buildout/apache2/mod_passenger.so
+        PassengerRoot <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-<%= @passenger_version %>
+        PassengerDefaultRuby <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/bin/ruby
 
-<VirtualHost *:80>
-        LoadModule passenger_module <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-4.0.48/buildout/apache2/mod_passenger.so
-        PassengerRoot <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-4.0.48
-        PassengerRuby <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/bin/ruby
         # you probably want to tune these settings
         PassengerHighPerformance on
         PassengerMaxPoolSize 12
         PassengerPoolIdleTime 1500
         # PassengerMaxRequests 1000
         PassengerStatThrottleRate 120
-        RackAutoDetect On
-        RailsAutoDetect Off
+
+        RailsBaseURI /
 
 #        SSLEngine on
 #        SSLProtocol -ALL +SSLv3 +TLSv1
@@ -22,17 +23,14 @@
 #        SSLCACertificateFile /etc/ssl/certs/ca.pem
 
         DocumentRoot <%= @docroot %>
-        RackBaseURI /
         <Directory <%= @docroot %>>
                 Options None
                 AllowOverride None
                 Order allow,deny
                 allow from all
         </Directory>
-       
-        ErrorLog <%= scope.lookupvar('apache::params::log_dir') %>/<%= @name %>_error.log
-        LogLevel warn
-        CustomLog <%= scope.lookupvar('apache::params::log_dir') %>/<%= @name %>_access.log combined
-        ServerSignature On
 
+        LogLevel warn
+        ErrorLog <%= scope.lookupvar('apache::params::log_dir') %>/<%= @fqdn %>_error.log
+        CustomLog <%= scope.lookupvar('apache::params::log_dir') %>/<%= @fqdn %>_access.log combined
 </VirtualHost>
