@@ -26,11 +26,11 @@ class redmine::apache(
     "${redmine::install_dir}/.rbenv/bin",
     '/bin', '/usr/bin', '/usr/sbin'
   ]
-  exec { "bundle exec gem install passenger --version ${passenger_version} --no-ri --no-rdoc":
+  exec { "gem install passenger --version ${passenger_version} --no-ri --no-rdoc":
     user   => $user,
     cwd    => $redmine_home,
     path   => $path,
-    unless => "bundle exec gem list passenger | grep -q '^passenger.*${passenger_version}'",
+    unless => "gem list passenger | grep -q '^passenger.*${passenger_version}'",
     notify => Exec['passenger-install-apache2-module -a'],
   }
   exec { 'passenger-install-apache2-module -a':
