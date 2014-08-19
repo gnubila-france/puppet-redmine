@@ -35,8 +35,7 @@ NameVirtualHost <%= @server_name %>:443
         SSLCertificateFile <%= scope.lookupvar('redmine::ssl_cert') %>
         SSLCertificateKeyFile <%= scope.lookupvar('redmine::ssl_cert_key') %>
         SSLCACertificateFile <%= scope.lookupvar('redmine::ssl_ca_cert') %>
-        <%- if ! scope.lookupvar('redmine::ssl_ca_cert_chain').nil? 
-               and scope.lookupvar('redmine::ssl_ca_cert_chain') != '' -%>
+        <%- if ! scope.lookupvar('redmine::ssl_ca_cert_chain').nil?  and scope.lookupvar('redmine::ssl_ca_cert_chain') != '' -%>
         SSLCertificateChainFile <%= scope.lookupvar('redmine::ssl_ca_cert_chain') %>
         <%- end -%>
         <%- end -%>
