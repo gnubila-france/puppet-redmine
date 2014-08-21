@@ -3,6 +3,8 @@ NameVirtualHost <%= @server_name %>:80
 <% if scope.lookupvar('redmine::ssl') %>
 NameVirtualHost <%= @server_name %>:443
 <VirtualHost <%= @server_name %>:80>
+    ServerName <%= @server_name %>
+
     # Redirect HTTP to HTTPS
     RewriteEngine On
     RewriteRule /(.*) https://%{HTTP_HOST}:443/$1 [R=302,NE]
@@ -15,6 +17,8 @@ NameVirtualHost <%= @server_name %>:443
 <% else %>
 <VirtualHost <%= @server_name %>:80>
 <% end -%>
+        ServerName <%= @server_name %>
+
         LoadModule passenger_module <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-<%= @passenger_version %>/buildout/apache2/mod_passenger.so
         PassengerRoot <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-<%= @passenger_version %>
         PassengerDefaultRuby <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/bin/ruby
