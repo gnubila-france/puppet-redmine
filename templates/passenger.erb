@@ -4,6 +4,13 @@ NameVirtualHost <%= @server_name %>:80
 NameVirtualHost <%= @server_name %>:443
 <VirtualHost <%= @server_name %>:80>
   ServerName <%= @server_name %>
+  <%- if @serveraliases != "" -%>
+  <%- if @serveraliases.is_a? Array -%>
+  ServerAlias <%= @serveraliases.flatten.join(" ") %>
+  <% else -%>
+  ServerAlias <%= @serveraliases %>
+  <%- end -%>
+  <%- end -%>
 
   # Redirect HTTP to HTTPS
   RewriteEngine On
@@ -18,6 +25,13 @@ NameVirtualHost <%= @server_name %>:443
 <VirtualHost <%= @server_name %>:80>
 <% end -%>
   ServerName <%= @server_name %>
+  <%- if @serveraliases != "" -%>
+  <%- if @serveraliases.is_a? Array -%>
+  ServerAlias <%= @serveraliases.flatten.join(" ") %>
+  <% else -%>
+  ServerAlias <%= @serveraliases %>
+  <%- end -%>
+  <%- end -%>
   
   LoadModule passenger_module <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-<%= @passenger_version %>/buildout/apache2/mod_passenger.so
   PassengerRoot <%= @install_dir %>/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-<%= @passenger_version %>
