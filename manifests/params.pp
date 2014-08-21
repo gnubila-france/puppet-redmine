@@ -25,6 +25,7 @@ class redmine::params {
   $webserver_type = undef
   $vhost_template = ''
   $server_name = $::fqdn
+  $serveraliases = undef
   $ruby_version = '1.9.3-p547'
   $passenger_version = '4.0.48'
   $owner = 'redmine'
