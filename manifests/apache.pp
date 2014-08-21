@@ -98,7 +98,7 @@ class redmine::apache(
     serveraliases => $::redmine::serveraliases,
     priority      => $vhost_priority,
     docroot       => $rack_location,
-    ssl           => true,
+    ssl           => $redmine::ssl,
     template      => $redmine::template_passenger,
     require       => File['redmine_link']
   }
