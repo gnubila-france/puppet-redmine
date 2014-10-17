@@ -37,7 +37,7 @@ class redmine::params {
   $plugins = undef
   $template_passenger = 'redmine/passenger.erb'
   $ssl = true
-  $ssl_protocol = '-ALL +TLSv1'
+  $ssl_protocol = 'All -SSLv2 -SSLv3'
   $ssl_cipher_suite = 'ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP'
   $ssl_cert = "/etc/ssl/certs/${::fqdn}.crt"
   $ssl_cert_key = "/etc/ssl/private/${::fqdn}.key"
