@@ -7,7 +7,6 @@ class redmine::apache(
   include ::redmine
   include ::apache
 
-  # SSL setup to be done
   if $::redmine::ssl {
     include apache::ssl
     # Required for redirection to https
