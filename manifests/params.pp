@@ -32,6 +32,7 @@ class redmine::params {
   $group = 'redmine'
   $install_dir = '/home/redmine'
   $install_deps = true
+  $email_delivery = 'sendmail'
   $smtp_domain = 'example.net'
   $smtp_server = 'localhost'
   $plugins = undef

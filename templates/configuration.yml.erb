@@ -81,11 +81,15 @@
 default:
   # Outgoing emails configuration (see examples above)
   email_delivery:
+<% if @email_delivery == 'smtp' %>
     delivery_method: :smtp
     smtp_settings:
       address: <%= @smtp_server %>
       port: 25
       domain: <%= @smtp_domain %>
+<% else %>
+    delivery_method: :sendmail
+<% end %>
 
   # Absolute path to the directory where attachments are stored.
   # The default is the 'files' directory in your Redmine instance.

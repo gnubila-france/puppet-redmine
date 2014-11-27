@@ -109,6 +109,7 @@ class redmine (
   $ssl_ca_cert_chain_src = params_lookup( 'ssl_ca_cert_chain_src' ),
   $install_dir         = params_lookup( 'install_dir' ),
   $install_deps        = params_lookup( 'install_deps' ),
+  $email_delivery      = params_lookup( 'email_delivery' ),
   $smtp_domain         = params_lookup( 'smtp_domain' ),
   $smtp_server         = params_lookup( 'smtp_server' ),
   $plugins             = params_lookup( 'plugins' ),
