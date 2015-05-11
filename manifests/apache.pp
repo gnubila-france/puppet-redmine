@@ -1,4 +1,40 @@
-class redmine::apache(
+# == Class: puppet-redmine::apache
+#
+# Full description of class puppet-redmine::apache here
+#
+# === Parameters
+#
+# [*user*]
+#   Name of the user for running redmine passenger.
+#   Default: redmine
+#
+# [*group*]
+#   Name of the group for running redmine passenger.
+#   Default: redmine
+#
+# [*redmine_home*]
+#   Home directory for the redmine installation.
+#   Default: /home/redmine/redmine
+#
+# [*template_passenger*]
+#   Name of the template used for redmine passenger configuration.
+#   Default: redmine/passenger.erb
+#
+# === Examples
+#
+#  include '::puppet-redmine::apache'
+#
+# Configuration is done using Hiera.
+#
+# === Authors
+#
+# Baptiste Grenier <bgrenier@gnubila.fr>
+#
+# === Copyright
+#
+# Copyright 2015 gnúbila
+#
+class redmine::apache (
   $user = $redmine::owner,
   $group = $user,
   $redmine_home = "${redmine::install_dir}/redmine",
