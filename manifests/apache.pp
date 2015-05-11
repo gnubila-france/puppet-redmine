@@ -94,6 +94,7 @@ class redmine::apache(
   $rack_location = "${redmine_home}/public/"
   apache::vhost { $::redmine::server_name:
     server_name   => $::redmine::server_name,
+    ip_addr       => $::redmine::ip_addr,
     serveraliases => $::redmine::serveraliases,
     priority      => $vhost_priority,
     docroot       => $rack_location,

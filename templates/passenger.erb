@@ -1,8 +1,8 @@
 # File Managed by Puppet
-NameVirtualHost <%= @server_name %>:80
+NameVirtualHost <%= @ip_addr %>:80
 <% if scope.lookupvar('redmine::ssl') %>
-NameVirtualHost <%= @server_name %>:443
-<VirtualHost <%= @server_name %>:80>
+NameVirtualHost <%= @ip_addr %>:443
+<VirtualHost <%= @ip_addr %>:80>
   ServerName <%= @server_name %>
   <%- if @serveraliases != "" -%>
   <%- if @serveraliases.is_a? Array -%>
@@ -20,9 +20,9 @@ NameVirtualHost <%= @server_name %>:443
 </VirtualHost>
 <% end -%>
 <% if scope.lookupvar('redmine::ssl') %>
-<VirtualHost <%= @server_name %>:443>
+<VirtualHost <%= @ip_addr %>:443>
 <% else %>
-<VirtualHost <%= @server_name %>:80>
+<VirtualHost <%= @ip_addr %>:80>
 <% end -%>
   ServerName <%= @server_name %>
   <%- if @serveraliases != "" -%>
