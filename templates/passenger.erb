@@ -1,7 +1,5 @@
 # File Managed by Puppet
-NameVirtualHost <%= @ip_addr %>:80
 <% if scope.lookupvar('redmine::ssl') %>
-NameVirtualHost <%= @ip_addr %>:443
 <VirtualHost <%= @ip_addr %>:80>
   ServerName <%= @server_name %>
   <%- if @serveraliases != "" -%>

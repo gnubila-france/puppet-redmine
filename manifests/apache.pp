@@ -51,6 +51,16 @@ class redmine::apache (
        ensure => 'present',
      }
     }
+    # XXX on debian Listen 443 is set in ports.conf, but NameVirtualHost is not
+    if ! defined(File_line['namevirtualhost-443']) {
+      file_line { 'namevirtualhost-443':
+        ensure => 'present',
+        path   => '/etc/apache2/ports.conf',
+        line   => 'NameVirtualHost *:443',
+        match  => '^\s*NameVirtualHost\s*\*:443',
+        notify => Service['apache']
+      }
+    }
     file { $::redmine::ssl_cert:
       ensure  => 'present',
       owner   => 'www-data',
