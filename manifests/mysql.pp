@@ -1,3 +1,21 @@
+# == Class: redmine::mysql
+#
+# Configure MySQL.
+#
+# === Examples
+#
+#  include '::redmine::mysql'
+#
+# Configuration is done using Hiera.
+#
+# === Authors
+#
+# Baptiste Grenier <bgrenier@gnubila.fr>
+#
+# === Copyright
+#
+# Copyright 2015 gnúbila
+#
 class redmine::mysql {
   if $::redmine::db_host == 'localhost' {
     include ::mysql
