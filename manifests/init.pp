@@ -222,7 +222,7 @@ class redmine (
   }
 
   # The whole redmine configuration directory can be recursively overriden
-  if $redmine::source_dir {
+  if $redmine::source_dir and $redmine::source_dir != '' {
     file { 'redmine.dir':
       ensure  => directory,
       path    => $redmine::config_dir,
@@ -238,7 +238,7 @@ class redmine (
   }
 
   ### Include custom class if $my_class is set
-  if $redmine::my_class {
+  if $redmine::my_class and $redmine::my_class != '' {
     include $redmine::my_class
   }
 
