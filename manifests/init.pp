@@ -90,6 +90,8 @@ class redmine (
   $db_user             = params_lookup( 'db_user' ),
   $db_password         = params_lookup( 'db_password' ),
   $db_host             = params_lookup( 'db_host' ),
+  $db_charset          = params_lookup( 'db_charset' ),
+  $db_collate          = params_lookup( 'db_collate' ),
   $webserver_type      = params_lookup( 'webserver_type' ),
   $vhost_template      = params_lookup( 'vhost_template' ),
   $server_name         = params_lookup( 'server_name' ),
