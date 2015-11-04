@@ -23,6 +23,8 @@ class redmine::mysql {
       user     => $::redmine::db_user,
       password => $::redmine::db_password,
       host     => $::redmine::db_host,
+      charset  => $::redmine::db_charset,
+      collate  => $::redmine::db_collate,
     }
   } else {
     include ::mysql::client
