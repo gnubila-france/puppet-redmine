@@ -265,7 +265,7 @@ class redmine (
     notify  => Exec['Update gems environment bundler'],
   }
 
-  $path = [ 
+  $path = [
     "${redmine::install_dir}/.rbenv/shims",
     "${redmine::install_dir}/.rbenv/bin",
     '/bin', '/usr/bin', '/usr/sbin'
