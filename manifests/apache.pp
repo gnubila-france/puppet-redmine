@@ -123,7 +123,7 @@ class redmine::apache (
 
   $rack_location = "${redmine_home}/public/"
   $custom_fragment = "LoadModule passenger_module ${::redmine::install_dir}/.rbenv/versions/${::redmine::ruby_version}/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}/buildout/apache2/mod_passenger.so
-PassengerRoot ${::redmine::install_dir}/.rbenv/versions/<%= @ruby_version %>/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}
+PassengerRoot ${::redmine::install_dir}/.rbenv/versions/${::ruby_version}/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}
 PassengerDefaultRuby ${::redmine::install_dir}/.rbenv/versions/${::redmine::ruby_version}/bin/ruby
 RailsBaseURI /
 # you probably want to tune these settings
