@@ -44,76 +44,61 @@ class redmine::apache (
   include ::apache
 
   if $::redmine::ssl {
-    include apache::ssl
-    # Required for redirection to https
-    if ! defined(Apache::Module['rewrite']) {
-     apache::module { 'rewrite':
-       ensure => 'present',
-     }
-    }
-    # XXX on debian Listen 443 is set in ports.conf, but NameVirtualHost is not
-    if ! defined(File_line['namevirtualhost-443']) {
-      file_line { 'namevirtualhost-443':
-        ensure => 'present',
-        path   => '/etc/apache2/ports.conf',
-        line   => 'NameVirtualHost *:443',
-        match  => '^\s*NameVirtualHost\s*\*:443',
-        notify => Service['apache']
-      }
-    }
+    include ::apache::mod::ssl
+
     file { $::redmine::ssl_cert:
-      ensure  => 'present',
-      owner   => 'www-data',
-      group   => 'www-data',
+      ensure  => 'file',
+      owner   => $::apache::user,
+      group   => $::apache::group,
       mode    => '0640',
       source  => $::redmine::ssl_cert_src,
-      notify  => Service['apache'],
+      notify  => Class['::apache::service'],
       require => [
         File[$::redmine::ssl_cert_key],
         File[$::redmine::ssl_ca_cert],
       ]
     }
     file { $::redmine::ssl_cert_key:
-      ensure => 'present',
-      owner  => 'www-data',
-      group  => 'www-data',
+      ensure => 'file',
+      owner  => $::apache::user,
+      group  => $::apache::group,
       mode   => '0400',
       source => $::redmine::ssl_cert_key_src,
-      notify => Service['apache'],
+      notify => Class['::apache::service'],
     }
     if ! defined(File[$::redmine::ssl_ca_cert]) {
       file { $::redmine::ssl_ca_cert:
-        ensure  => 'present',
-        owner   => 'www-data',
-        group   => 'www-data',
-        mode    => '0640',
-        source  => $::redmine::ssl_ca_cert_src,
-        notify  => Service['apache'],
+        ensure => 'file',
+        owner  => $::apache::user,
+        group  => $::apache::group,
+        mode   => '0640',
+        source => $::redmine::ssl_ca_cert_src,
+        notify => Class['::apache::service'],
       }
     }
     if $::redmine::ssl_ca_cert_chain != undef and
       ! defined(File[$::redmine::ssl_ca_cert_chain]) {
       file { $::redmine::ssl_ca_cert_chain:
-        ensure => 'present',
-        owner  => 'www-data',
-        group  => 'www-data',
+        ensure => 'file',
+        owner  => $::apache::user,
+        group  => $::apache::group,
         mode   => '0640',
         source => $::redmine::ssl_ca_cert_chain_src,
-        notify => Service['apache'],
+        notify => Class['::apache::service'],
       }
     }
   }
 
   $path = [
-    "${redmine::install_dir}/.rbenv/shims",
-    "${redmine::install_dir}/.rbenv/bin",
+    "${::redmine::install_dir}/.rbenv/shims",
+    "${::redmine::install_dir}/.rbenv/bin",
     '/bin', '/usr/bin', '/usr/sbin'
   ]
-  exec { "gem install passenger --version ${passenger_version} --no-ri --no-rdoc":
+  exec { "gem install passenger --version ${::redmine::passenger_version} --no-ri --no-rdoc":
     user   => $user,
     cwd    => $redmine_home,
     path   => $path,
-    unless => "gem list passenger | grep -q '^passenger.*${passenger_version}'",
+    unless => "gem list passenger | grep -q '^passenger.*${::redmine::passenger_version}'",
     notify => Exec['passenger-install-apache2-module -a'],
   }
   exec { 'passenger-install-apache2-module -a':
@@ -130,23 +115,47 @@ class redmine::apache (
   }
 
   file { "${redmine_home}/config.ru":
-    ensure  => 'present',
-    owner   => $user,
-    group   => $user,
-    mode    => '0644',
+    ensure => 'file',
+    owner  => $user,
+    group  => $user,
+    mode   => '0644',
   }
 
-  $vhost_priority = 10
   $rack_location = "${redmine_home}/public/"
+  $custom_fragment = "LoadModule passenger_module ${::redmine::install_dir}/.rbenv/versions/${::redmine::ruby_version}/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}/buildout/apache2/mod_passenger.so
+PassengerRoot ${::redmine::install_dir}/.rbenv/versions/${::ruby_version}/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}
+PassengerDefaultRuby ${::redmine::install_dir}/.rbenv/versions/${::redmine::ruby_version}/bin/ruby
+RailsBaseURI /
+# you probably want to tune these settings
+PassengerHighPerformance on
+PassengerMaxPoolSize 12
+PassengerPoolIdleTime 1500
+# PassengerMaxRequests 1000
+PassengerStatThrottleRate 120"
   apache::vhost { $::redmine::server_name:
-    server_name   => $::redmine::server_name,
-    ip_addr       => $::redmine::ip_addr,
-    serveraliases => $::redmine::serveraliases,
-    priority      => $vhost_priority,
-    docroot       => $rack_location,
-    ssl           => $redmine::ssl,
-    template      => $redmine::template_passenger,
-    require       => File['redmine_link']
+    port                 => '443',
+    serveraliases        => $::redmine::serveraliases,
+    docroot              => $rack_location,
+    directories          => [
+      {
+        path     => $rack_location,
+        provider => 'directory',
+        order    => 'allow,deny',
+        allow    => 'from all',
+        options  => ['None'],
+        override => ['None'],
+      },
+    ],
+    custom_fragment      => $custom_fragment,
+    ssl                  => true,
+    ssl_cert             => $::redmine::ssl_cert,
+    ssl_key              => $::redmine::ssl_cert_key,
+    ssl_chain            => $::redmine::ssl_ca_cert_chain,
+    ssl_ca               => $::redmine::ssl_ca_cert,
+    ssl_protocol         => $::redmine::ssl_protocol,
+    ssl_cipher           => $::redmine::ssl_cipher_suite,
+    ssl_honorcipherorder => 'On',
+    require              => File['redmine_link']
   }
 }
 

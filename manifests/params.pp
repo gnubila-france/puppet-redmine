@@ -22,6 +22,8 @@ class redmine::params {
   $db_user = 'redmine'
   $db_password = 'redmine'
   $db_host = 'localhost'
+  $db_charset = 'utf8'
+  $db_collate = 'utf8_general_ci'
   $webserver_type = undef
   $vhost_template = ''
   $server_name = $::fqdn

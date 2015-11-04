@@ -90,6 +90,8 @@ class redmine (
   $db_user             = params_lookup( 'db_user' ),
   $db_password         = params_lookup( 'db_password' ),
   $db_host             = params_lookup( 'db_host' ),
+  $db_charset          = params_lookup( 'db_charset' ),
+  $db_collate          = params_lookup( 'db_collate' ),
   $webserver_type      = params_lookup( 'webserver_type' ),
   $vhost_template      = params_lookup( 'vhost_template' ),
   $server_name         = params_lookup( 'server_name' ),
@@ -222,7 +224,7 @@ class redmine (
   }
 
   # The whole redmine configuration directory can be recursively overriden
-  if $redmine::source_dir {
+  if $redmine::source_dir and $redmine::source_dir != '' {
     file { 'redmine.dir':
       ensure  => directory,
       path    => $redmine::config_dir,
@@ -238,7 +240,7 @@ class redmine (
   }
 
   ### Include custom class if $my_class is set
-  if $redmine::my_class {
+  if $redmine::my_class and $redmine::my_class != '' {
     include $redmine::my_class
   }
 
@@ -263,7 +265,7 @@ class redmine (
     notify  => Exec['Update gems environment bundler'],
   }
 
-  $path = [ 
+  $path = [
     "${redmine::install_dir}/.rbenv/shims",
     "${redmine::install_dir}/.rbenv/bin",
     '/bin', '/usr/bin', '/usr/sbin'
