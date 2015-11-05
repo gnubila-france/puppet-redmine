@@ -1,4 +1,4 @@
-# == Class: puppet-redmine::dependencies
+# == Class: redmine::dependencies
 #
 # Manage redmine dependencies
 #
@@ -8,7 +8,7 @@
 #
 # === Examples
 #
-#  include '::puppet-redmine::dependencies'
+#  include '::redmine::dependencies'
 #
 # Configuration is done using Hiera.
 #

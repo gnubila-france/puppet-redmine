@@ -1,6 +1,6 @@
-# == Class: puppet-redmine::apache
+# == Class: redmine::apache
 #
-# Full description of class puppet-redmine::apache here
+# Configure an apache VHost for redmine.
 #
 # === Parameters
 #
@@ -22,7 +22,7 @@
 #
 # === Examples
 #
-#  include '::puppet-redmine::apache'
+#  include '::redmine::apache'
 #
 # Configuration is done using Hiera.
 #
