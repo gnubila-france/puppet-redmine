@@ -72,7 +72,7 @@ define redmine::plugin (
     user        => $user,
     cwd         => $redmine_home,
     path        => $path,
-    environment => [ "RAILS_ENV=production" ],
+    environment => [ 'RAILS_ENV=production' ],
     refreshonly => true,
     require     => Exec['Run database migration'],
   }
