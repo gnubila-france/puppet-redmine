@@ -1,3 +1,25 @@
+# == Class: puppet-redmine::dependencies
+#
+# Manage redmine dependencies
+#
+# === Parameters
+#
+# Document parameters here.
+#
+# === Examples
+#
+#  include '::puppet-redmine::dependencies'
+#
+# Configuration is done using Hiera.
+#
+# === Authors
+#
+# Baptiste Grenier <bgrenier@gnubila.fr>
+#
+# === Copyright
+#
+# Copyright 2015 gnúbila
+#
 class redmine::dependencies {
   package { 'imagemagick':
     ensure => 'present',
