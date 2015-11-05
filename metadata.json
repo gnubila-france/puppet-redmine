@@ -1,6 +1,6 @@
 {
   "name": "gnubilafrance-redmine",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Baptiste Grenier <bgrenier@gnubila.fr>",
   "license": "MIT",
   "summary": "Multi redmine setup with mysql, apache and rbenv",
