@@ -179,7 +179,7 @@ class redmine (
     ensure     => 'present',
     home       => $redmine::install_dir,
     managehome => true,
-    shell      => "/bin/bash",
+    shell      => '/bin/bash',
   }
 
   $src_url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
@@ -303,7 +303,7 @@ class redmine (
     user        => $redmine::owner,
     cwd         => $redmine_home,
     path        => $path,
-    environment => [ "RAILS_ENV=production" ],
+    environment => [ 'RAILS_ENV=production' ],
     refreshonly => true,
   }
 
@@ -312,7 +312,7 @@ class redmine (
     user        => $redmine::owner,
     cwd         => $redmine_home,
     path        => $path,
-    environment => [ "RAILS_ENV=production", "REDMINE_LANG=en" ],
+    environment => [ 'RAILS_ENV=production', 'REDMINE_LANG=en' ],
     refreshonly => true,
   }
 
@@ -325,7 +325,7 @@ class redmine (
   }
 
   if $redmine::plugins != undef and is_hash($redmine::plugins) {
-    create_resources("::redmine::plugin", $redmine::plugins)
+    create_resources('::redmine::plugin', $redmine::plugins)
   }
 }
 
