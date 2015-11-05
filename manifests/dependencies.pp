@@ -38,6 +38,9 @@ class redmine::dependencies {
         ensure => 'present',
       }
     }
+    default: {
+      fail('Unsupported db_type')
+    }
   }
 
   if $redmine::webserver_type == 'apache' {
