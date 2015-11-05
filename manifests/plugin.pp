@@ -1,4 +1,25 @@
+# == Define: redmine::plugin
+#
 # Define allowing to install a redmine plugin
+#
+# === Parameters
+#
+# Document parameters here.
+#
+# === Examples
+#
+#  'redmine::plugin' { 'namevar':
+#    parameter1 => [ 'just', 'an', 'example', ]
+#  }
+#
+# === Authors
+#
+# Baptiste Grenier <bgrenier@gnubila.fr>
+#
+# === Copyright
+#
+# Copyright 2015 gnúbila
+#
 define redmine::plugin (
   $user = $redmine::owner,
   $group = $user,
