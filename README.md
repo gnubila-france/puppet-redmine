@@ -1,5 +1,8 @@
 # Puppet module: redmine
 
+[![Puppet Forge](http://img.shields.io/puppetforge/v/gnubilafrance/redmine.svg)](https://forge.puppetlabs.com/gnubilafrance/redmine)
+[![Build Status](https://travis-ci.org/gnubila-france/puppet-redmine.png?branch=master)](https://travis-ci.org/gnubila-france/puppet-redmine)
+
 This is a Puppet module for redmine
 It provides only package installation and file configuration.
 
