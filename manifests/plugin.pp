@@ -39,7 +39,7 @@ define redmine::plugin (
     source   => $repo_url,
     revision => $revision,
     user     => $user,
-    notify   => Exec["Update gems environment using bundler for plugin ${title}"],
+    notify   => Exec["Install gems using bundler for plugin ${title}"],
     require  => File['redmine_link'],
   }
 
@@ -48,15 +48,6 @@ define redmine::plugin (
     "${redmine::install_dir}/.rbenv/bin",
     '/bin', '/usr/bin', '/usr/sbin'
   ]
-  exec { "Update gems environment using bundler for plugin ${title}":
-    command     => 'bundle update',
-    user        => $user,
-    cwd         => "${redmine_home}/plugins/${title}",
-    path        => $path,
-    refreshonly => true,
-    notify      => Exec["Install gems using bundler for plugin ${title}"],
-    require     => Exec['Install gems using bundler'],
-  }
   exec { "Install gems using bundler for plugin ${title}":
     command     => 'bundle install --without development test',
     user        => $user,

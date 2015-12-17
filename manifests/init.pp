@@ -262,7 +262,7 @@ class redmine (
     ruby    => $redmine::ruby_version,
     global  => true,
     require => Rbenv::Install[$redmine::owner],
-    notify  => Exec['Update gems environment bundler'],
+    notify  => Exec['Install gems using bundler'],
   }
 
   $path = [
@@ -271,21 +271,13 @@ class redmine (
     '/bin', '/usr/bin', '/usr/sbin'
   ]
   $redmine_home = "${redmine::install_dir}/redmine"
-  exec { 'Update gems environment bundler':
-    command     => 'bundle update',
-    user        => $redmine::owner,
-    cwd         => $redmine_home,
-    path        => $path,
-    refreshonly => true,
-    notify      => Exec['Install gems using bundler'],
-    require     => File['redmine-database.conf'],
-  }
   exec { 'Install gems using bundler':
     command     => 'bundle install --without development test',
     user        => $redmine::owner,
     cwd         => $redmine_home,
     path        => $path,
     refreshonly => true,
+    require     => File['redmine-database.conf'],
     notify      => Exec['Generate secret token'],
   }
 
