@@ -104,7 +104,6 @@ class redmine (
   $ssl_cert_src        = params_lookup( 'ssl_cert_src' ),
   $ssl_cert_key        = params_lookup( 'ssl_cert_key' ),
   $ssl_cert_key_src    = params_lookup( 'ssl_cert_key_src' ),
-  $ssl_ca_cert_chain   = params_lookup( 'ssl_ca_cert_chain' ),
   $ssl_ca_cert         = params_lookup( 'ssl_ca_cert' ),
   $ssl_ca_cert_src     = params_lookup( 'ssl_ca_cert_src' ),
   $ssl_ca_cert_chain   = params_lookup( 'ssl_ca_cert_chain' ),
