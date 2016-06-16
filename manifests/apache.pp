@@ -34,14 +34,18 @@
 #
 # Copyright 2015 gnúbila
 #
-class redmine::apache (
-  $user = $redmine::owner,
-  $group = $user,
-  $redmine_home = "${redmine::install_dir}/redmine",
-  $template_passenger = params_lookup( 'template_passenger' ),
-) inherits redmine::params {
+class redmine::apache {
+
   include ::redmine
   include ::apache
+
+  $user = $redmine::user
+  $group = $redmine::group
+  $install_dir = $redmine::install_dir
+  $redmine_home = "${redmine::install_dir}"
+
+  # where is $template_passenger being used ???
+  #$template_passenger = $redmine::apache::template_passenger
 
   if $::redmine::ssl {
     include ::apache::mod::ssl
@@ -90,8 +94,8 @@ class redmine::apache (
   }
 
   $path = [
-    "${::redmine::install_dir}/.rbenv/shims",
-    "${::redmine::install_dir}/.rbenv/bin",
+    "${::redmine::user_home}/.rbenv/shims",
+    "${::redmine::user_home}/.rbenv/bin",
     '/bin', '/usr/bin', '/usr/sbin'
   ]
   exec { "gem install passenger --version ${::redmine::passenger_version} --no-ri --no-rdoc":
@@ -122,9 +126,9 @@ class redmine::apache (
   }
 
   $rack_location = "${redmine_home}/public/"
-  $custom_fragment = "LoadModule passenger_module ${::redmine::install_dir}/.rbenv/versions/${::redmine::ruby_version}/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}/buildout/apache2/mod_passenger.so
-PassengerRoot ${::redmine::install_dir}/.rbenv/versions/${::redmine::ruby_version}/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}
-PassengerDefaultRuby ${::redmine::install_dir}/.rbenv/versions/${::redmine::ruby_version}/bin/ruby
+  $custom_fragment = "LoadModule passenger_module ${::redmine::user_home}/.rbenv/versions/${::redmine::ruby_version}/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}/buildout/apache2/mod_passenger.so
+PassengerRoot ${::redmine::user_home}/.rbenv/versions/${::redmine::ruby_version}/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}
+PassengerDefaultRuby ${::redmine::user_home}/.rbenv/versions/${::redmine::ruby_version}/bin/ruby
 RailsBaseURI /
 # you probably want to tune these settings
 PassengerHighPerformance on
