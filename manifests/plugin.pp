@@ -21,8 +21,8 @@
 # Copyright 2015 gnúbila
 #
 define redmine::plugin (
-  $user = $redmine::owner,
-  $group = $user,
+  $user = $redmine::user,
+  $group = $redmine::group,
   $redmine_home = "${redmine::install_dir}/redmine",
   $repo_url = undef,
   $revision = 'master',

@@ -1,0 +1,10 @@
+---
+redmine::dependencies::pname_imagemagick: imagemagick
+redmine::dependencies::pname_imagemagick_dev: libmagickwand-dev
+redmine::dependencies::pname_mysql_dev: libmysqlclient-dev
+redmine::dependencies::pname_pgsql_dev: libpq-dev
+
+redmine::dependencies::pname_openssl_dev: libcurl4-openssl-dev
+redmine::dependencies::pname_apache_dev: apache2-threaded-dev
+redmine::dependencies::pname_apr_dev: libapr1-dev
+redmine::dependencies::pname_apr_util_dev: libaprutil1-dev

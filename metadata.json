@@ -44,5 +44,6 @@
     { "name": "puppetlabs/mysql", "version_requirement": ">= 3.6.1" },
     { "name": "puppetlabs/apache", "version_requirement": ">= 1.6.0" },
     { "name": "puppetlabs/vcsrepo", "version_requirement": ">= 1.1.0" }
-  ]
+  ],
+  "data_provider": "hiera"
 }

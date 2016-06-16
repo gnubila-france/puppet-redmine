@@ -20,21 +20,34 @@
 #
 # Copyright 2015 gnúbila
 #
-class redmine::dependencies {
-  package { 'imagemagick':
+
+class redmine::dependencies (
+  String $pname_imagemagick,
+  String $pname_imagemagick_dev,
+  String $pname_mysql_dev,
+  String $pname_pgsql_dev,
+  String $pname_openssl_dev,
+  String $pname_apache_dev,
+  String $pname_apr_dev,
+  String $pname_apr_util_dev,
+  ) {
+
+  include ::redmine
+
+  package { $redmine::dependencies::pname_imagemagick:
     ensure => 'present',
   }
-  package { 'libmagickwand-dev':
+  package { $redmine::dependencies::pname_imagemagick_dev:
     ensure => 'present',
   }
   case $redmine::db_type {
     /^mysql/: {
-      package { 'libmysqlclient-dev':
+      package { $redmine::dependencies::pname_mysql_dev:
         ensure => 'present',
       }
     }
     'pgsql': {
-      package { 'libpq-dev':
+      package { $redmine::dependencies::pname_pgsql_dev:
         ensure => 'present',
       }
     }
@@ -44,16 +57,16 @@ class redmine::dependencies {
   }
 
   if $redmine::webserver_type == 'apache' {
-    package { 'libcurl4-openssl-dev':
+    package { $redmine::dependencies::pname_openssl_dev:
       ensure => 'present',
     }
-    package { 'apache2-threaded-dev':
+    package { $redmine::dependencies::pname_apache_dev:
       ensure => 'present',
     }
-    package { 'libapr1-dev':
+    package { $redmine::dependencies::pname_apr_dev:
       ensure => 'present',
     }
-    package { 'libaprutil1-dev':
+    package { $redmine::dependencies::pname_apr_util_dev:
       ensure => 'present',
     }
   }
