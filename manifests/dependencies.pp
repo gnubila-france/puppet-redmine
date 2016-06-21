@@ -22,6 +22,8 @@
 #
 
 class redmine::dependencies (
+  String $pname_passenger,
+  String $pname_mod_passenger,
   String $pname_imagemagick,
   String $pname_imagemagick_dev,
   String $pname_mysql_dev,
@@ -34,22 +36,25 @@ class redmine::dependencies (
 
   include ::redmine
 
-  package { $redmine::dependencies::pname_imagemagick:
-    ensure => 'present',
+  file { '/etc/yum.repos.d/passenger.repo':
+    source => [
+      "https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo",
+      "puppet:///files/repos/passenger.repo",
+    ]
   }
-  package { $redmine::dependencies::pname_imagemagick_dev:
-    ensure => 'present',
-  }
+
+  package { $redmine::dependencies::pname_passenger: ensure => 'present' }
+  package { $redmine::dependencies::pname_mod_passenger: ensure => 'present' }
+
+  package { $redmine::dependencies::pname_imagemagick: ensure => 'present' }
+  package { $redmine::dependencies::pname_imagemagick_dev: ensure => 'present' }
+
   case $redmine::db_type {
     /^mysql/: {
-      package { $redmine::dependencies::pname_mysql_dev:
-        ensure => 'present',
-      }
+      package { $redmine::dependencies::pname_mysql_dev: ensure => 'present' }
     }
     'pgsql': {
-      package { $redmine::dependencies::pname_pgsql_dev:
-        ensure => 'present',
-      }
+      package { $redmine::dependencies::pname_pgsql_dev: ensure => 'present' }
     }
     default: {
       fail('Unsupported db_type')
@@ -57,18 +62,10 @@ class redmine::dependencies (
   }
 
   if $redmine::webserver_type == 'apache' {
-    package { $redmine::dependencies::pname_openssl_dev:
-      ensure => 'present',
-    }
-    package { $redmine::dependencies::pname_apache_dev:
-      ensure => 'present',
-    }
-    package { $redmine::dependencies::pname_apr_dev:
-      ensure => 'present',
-    }
-    package { $redmine::dependencies::pname_apr_util_dev:
-      ensure => 'present',
-    }
+    package { $redmine::dependencies::pname_openssl_dev: ensure => 'present' }
+    package { $redmine::dependencies::pname_apache_dev: ensure => 'present' }
+    package { $redmine::dependencies::pname_apr_dev: ensure => 'present' }
+    package { $redmine::dependencies::pname_apr_util_dev: ensure => 'present' }
   }
 }
 
