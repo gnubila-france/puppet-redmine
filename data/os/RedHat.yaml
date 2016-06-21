@@ -1,11 +1,11 @@
 ---
-redmine::dependencies::pname_imagemagick: ImageMagick
+redmine::dependencies::pname_apache_dev:      httpd-devel
+redmine::dependencies::pname_apr_dev:         apr-devel
+redmine::dependencies::pname_apr_util_dev:    apr-util-devel
+redmine::dependencies::pname_imagemagick:     ImageMagick
 redmine::dependencies::pname_imagemagick_dev: ImageMagick-devel
-redmine::dependencies::pname_mysql_dev: mysql-devel
-redmine::dependencies::pname_pgsql_dev: postgresql-devel
-
-redmine::dependencies::pname_openssl_dev: openssl-devel
-redmine::dependencies::pname_apache_dev: httpd-devel
-redmine::dependencies::pname_apr_dev: apr-devel
-redmine::dependencies::pname_apr_util_dev: apr-util-devel
-
+redmine::dependencies::pname_mod_passenger:   mod_passenger
+redmine::dependencies::pname_mysql_dev:       mysql-devel
+redmine::dependencies::pname_openssl_dev:     openssl-devel
+redmine::dependencies::pname_passenger:       passenger
+redmine::dependencies::pname_pgsql_dev:       postgresql-devel

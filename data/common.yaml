@@ -24,7 +24,8 @@ redmine::email_delivery: 'sendmail'
 redmine::smtp_domain: 'example.net'
 redmine::smtp_server: 'localhost'
 redmine::plugins: 'undef'
-redmine::ssl: true
+#redmine::ssl: true
+redmine::ssl: false
 redmine::ssl_protocol: 'All -SSLv2 -SSLv3'
 redmine::ssl_cipher_suite: 'ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP'
 redmine::ssl_cert: '/etc/ssl/certs/%{::fqdn}.crt'

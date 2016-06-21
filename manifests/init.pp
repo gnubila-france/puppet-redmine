@@ -186,15 +186,16 @@ class redmine (
   $src_url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
   puppi::netinstall { 'redmine':
     url             => $src_url,
-    destination_dir => $redmine::install_dir,
+    destination_dir => $redmine::user_home,
     owner           => $redmine::user,
     group           => $redmine::group,
     require         => User[$redmine::user],
   }
+
   file { 'redmine_link':
     ensure  => 'link',
-    target  => "${redmine::install_dir}/redmine-${redmine::version}",
-    path    => "${redmine::install_dir}/redmine",
+    target  => "${redmine::user_home}/redmine-${redmine::version}",
+    path    => "${redmine::user_home}/redmine",
     require => Puppi::Netinstall['redmine'],
   }
 
@@ -252,30 +253,14 @@ class redmine (
   # Setup database
   include "redmine::${redmine::db_type}"
 
-  rbenv::install { $redmine::user:
-    home    => $redmine::user_home,
-    require => User[$redmine::user],
-  }
-
-  rbenv::compile { "${redmine::user}/${redmine::ruby_version}":
-    user    => $redmine::user,
-    home    => $redmine::install_dir,
-    ruby    => $redmine::ruby_version,
-    global  => true,
-    require => Rbenv::Install[$redmine::user],
-    notify  => Exec['Update gems environment bundler'],
-  }
-
   $path = [
-    "${redmine::install_dir}/.rbenv/shims",
-    "${redmine::install_dir}/.rbenv/bin",
+    "${redmine::user_home}/bin",
     '/bin', '/usr/bin', '/usr/sbin'
   ]
-  $redmine_home = "${redmine::install_dir}/redmine"
   exec { 'Update gems environment bundler':
     command     => 'bundle update',
     user        => $redmine::user,
-    cwd         => $redmine_home,
+    cwd         => $redmine::install_dir,
     path        => $path,
     refreshonly => true,
     notify      => Exec['Install gems using bundler'],
@@ -284,7 +269,7 @@ class redmine (
   exec { 'Install gems using bundler':
     command     => 'bundle install --without development test',
     user        => $redmine::user,
-    cwd         => $redmine_home,
+    cwd         => $redmine::install_dir,
     path        => $path,
     refreshonly => true,
     notify      => Exec['Generate secret token'],
@@ -293,7 +278,7 @@ class redmine (
   exec { 'Generate secret token':
     command     => 'bundle exec rake generate_secret_token',
     user        => $redmine::user,
-    cwd         => $redmine_home,
+    cwd         => $redmine::install_dir,
     path        => $path,
     refreshonly => true,
     notify      => Exec['Run database migration'],
@@ -302,7 +287,7 @@ class redmine (
   exec { 'Run database migration':
     command     => 'bundle exec rake db:migrate',
     user        => $redmine::user,
-    cwd         => $redmine_home,
+    cwd         => $redmine::install_dir,
     path        => $path,
     environment => [ 'RAILS_ENV=production' ],
     refreshonly => true,
@@ -311,7 +296,7 @@ class redmine (
   exec { 'Insert default data set':
     command     => 'bundle exec rake redmine::load_default_data',
     user        => $redmine::user,
-    cwd         => $redmine_home,
+    cwd         => $redmine::install_dir,
     path        => $path,
     environment => [ 'RAILS_ENV=production', 'REDMINE_LANG=en' ],
     refreshonly => true,

@@ -23,7 +23,6 @@
 define redmine::plugin (
   $user = $redmine::user,
   $group = $redmine::group,
-  $redmine_home = "${redmine::install_dir}/redmine",
   $repo_url = undef,
   $revision = 'master',
   $provider = 'git',
@@ -33,7 +32,7 @@ define redmine::plugin (
   if $repo_url == undef {
     fail('Please provide rep_url.')
   }
-  vcsrepo { "${redmine_home}/plugins/${title}":
+  vcsrepo { "${redmine::install_dir}/plugins/${title}":
     ensure   => 'present',
     provider => $provider,
     source   => $repo_url,
@@ -44,14 +43,13 @@ define redmine::plugin (
   }
 
   $path = [
-    "${redmine::install_dir}/.rbenv/shims",
-    "${redmine::install_dir}/.rbenv/bin",
+    "${redmine::user_home}/bin",
     '/bin', '/usr/bin', '/usr/sbin'
   ]
   exec { "Update gems environment using bundler for plugin ${title}":
     command     => 'bundle update',
     user        => $user,
-    cwd         => "${redmine_home}/plugins/${title}",
+    cwd         => "${redmine::install_dir}/plugins/${title}",
     path        => $path,
     refreshonly => true,
     notify      => Exec["Install gems using bundler for plugin ${title}"],
@@ -60,7 +58,7 @@ define redmine::plugin (
   exec { "Install gems using bundler for plugin ${title}":
     command     => 'bundle install --without development test',
     user        => $user,
-    cwd         => "${redmine_home}/plugins/${title}",
+    cwd         => "${redmine::install_dir}/plugins/${title}",
     path        => $path,
     refreshonly => true,
     notify      => Exec["Run database migration for plugin ${title}"],
@@ -70,7 +68,7 @@ define redmine::plugin (
   exec { "Run database migration for plugin ${title}":
     command     => 'bundle exec rake redmine:plugins:migrate',
     user        => $user,
-    cwd         => $redmine_home,
+    cwd         => $redmine::install_dir,
     path        => $path,
     environment => [ 'RAILS_ENV=production' ],
     refreshonly => true,
