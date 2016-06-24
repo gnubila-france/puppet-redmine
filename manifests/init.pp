@@ -259,7 +259,7 @@ class redmine (
 
   $path = [
     "${redmine::user_home}/bin",
-    '/bin', '/usr/bin', '/usr/sbin'
+    '/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin'
   ]
 
   exec { 'install bundler':
@@ -268,6 +268,7 @@ class redmine (
     cwd         => $redmine::install_dir,
     path        => $path,
     refreshonly => true,
+    require     => File['redmine-database.conf'],
     notify      => Exec['Update gems environment bundler'],
   }
 
@@ -277,8 +278,8 @@ class redmine (
     cwd         => $redmine::install_dir,
     path        => $path,
     refreshonly => true,
+    require     => Exec['install bundler'],
     notify      => Exec['Install gems using bundler'],
-    require     => File['redmine-database.conf'],
   }
 
   exec { 'Install gems using bundler':
@@ -287,6 +288,7 @@ class redmine (
     cwd         => $redmine::install_dir,
     path        => $path,
     refreshonly => true,
+    require     => Exec['Update gems environment bundler'],
     notify      => Exec['Generate secret token'],
   }
 
@@ -296,6 +298,7 @@ class redmine (
     cwd         => $redmine::install_dir,
     path        => $path,
     refreshonly => true,
+    require     => Exec['Install gems using bundler'],
     notify      => Exec['Run database migration'],
   }
 
@@ -328,6 +331,15 @@ class redmine (
   if $redmine::plugins != undef and is_hash($redmine::plugins) {
     create_resources('::redmine::plugin', $redmine::plugins)
   }
+
+  #User[$redmine::user]->
+  #Puppi::Netinstall['redmine']->
+  #File['redmine_link']->
+  #File['redmine.dir']->
+  #File['redmine.conf']->
+  #File['redmine-database.conf']->
+  #Exec['install bundler']
+
 }
 
 # vim: set et sw=2:
