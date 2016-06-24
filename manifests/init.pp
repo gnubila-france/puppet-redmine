@@ -261,6 +261,16 @@ class redmine (
     "${redmine::user_home}/bin",
     '/bin', '/usr/bin', '/usr/sbin'
   ]
+
+  exec { 'install bundler':
+    command     => 'gem install bundle --no-rdoc --no-ri',
+    user        => $redmine::user,
+    cwd         => $redmine::install_dir,
+    path        => $path,
+    refreshonly => true,
+    notify      => Exec['Update gems environment bundler'],
+  }
+
   exec { 'Update gems environment bundler':
     command     => 'bundle update',
     user        => $redmine::user,
@@ -270,6 +280,7 @@ class redmine (
     notify      => Exec['Install gems using bundler'],
     require     => File['redmine-database.conf'],
   }
+
   exec { 'Install gems using bundler':
     command     => 'bundle install --without development test',
     user        => $redmine::user,
