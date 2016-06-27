@@ -201,6 +201,8 @@ class redmine (
     target  => "${redmine::user_home}/redmine-${redmine::version}",
     path    => "${redmine::user_home}/redmine",
     require => Puppi::Netinstall['redmine'],
+    notify  => File['redmine.conf'],
+    #notify  => Exec['gem install bundler'],
   }
 
   file { 'redmine.conf':
@@ -227,6 +229,7 @@ class redmine (
     replace => $redmine::manage_file_replace,
     audit   => $redmine::manage_audit,
     noop    => $redmine::bool_noops,
+    notify  => Exec['gem install bundler'],
   }
 
   # The whole redmine configuration directory can be recursively overriden
@@ -259,16 +262,16 @@ class redmine (
 
   $path = [
     "${redmine::user_home}/bin",
-    '/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin'
+    '/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin',
   ]
 
-  exec { 'install bundler':
-    command     => 'gem install bundle --no-rdoc --no-ri',
+  exec { 'gem install bundler':
+    command     => 'gem install bundler --no-rdoc --no-ri',
     user        => $redmine::user,
-    cwd         => $redmine::install_dir,
+    cwd         => $redmine::user_home,
     path        => $path,
-    refreshonly => true,
-    require     => File['redmine-database.conf'],
+    environment => ["HOME=$redmine::user_home"],
+    require     => User["$redmine::user"],
     notify      => Exec['Update gems environment bundler'],
   }
 
@@ -277,17 +280,19 @@ class redmine (
     user        => $redmine::user,
     cwd         => $redmine::install_dir,
     path        => $path,
+    environment => ["HOME=$redmine::user_home"],
     refreshonly => true,
-    require     => Exec['install bundler'],
+    require     => Exec['gem install bundler'],
     notify      => Exec['Install gems using bundler'],
   }
 
   exec { 'Install gems using bundler':
-    command     => 'bundle install --without development test',
+    command     => "bundle install --path ${redmine::user_home}/.gem --without development test",
     user        => $redmine::user,
     cwd         => $redmine::install_dir,
     path        => $path,
-    refreshonly => true,
+    environment => ["HOME=$redmine::user_home"],
+    #refreshonly => true,
     require     => Exec['Update gems environment bundler'],
     notify      => Exec['Generate secret token'],
   }
@@ -297,6 +302,7 @@ class redmine (
     user        => $redmine::user,
     cwd         => $redmine::install_dir,
     path        => $path,
+    environment => ["HOME=$redmine::user_home"],
     refreshonly => true,
     require     => Exec['Install gems using bundler'],
     notify      => Exec['Run database migration'],
@@ -307,7 +313,7 @@ class redmine (
     user        => $redmine::user,
     cwd         => $redmine::install_dir,
     path        => $path,
-    environment => [ 'RAILS_ENV=production' ],
+    environment => ["HOME=$redmine::user_home",'RAILS_ENV=production' ],
     refreshonly => true,
   }
 
@@ -331,14 +337,6 @@ class redmine (
   if $redmine::plugins != undef and is_hash($redmine::plugins) {
     create_resources('::redmine::plugin', $redmine::plugins)
   }
-
-  #User[$redmine::user]->
-  #Puppi::Netinstall['redmine']->
-  #File['redmine_link']->
-  #File['redmine.dir']->
-  #File['redmine.conf']->
-  #File['redmine-database.conf']->
-  #Exec['install bundler']
 
 }
 
