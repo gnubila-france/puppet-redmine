@@ -281,7 +281,6 @@ class redmine (
     cwd         => $redmine::install_dir,
     path        => $path,
     environment => ["HOME=$redmine::user_home"],
-    refreshonly => true,
     require     => Exec['gem install bundler'],
     notify      => Exec['Install gems using bundler'],
   }
@@ -292,7 +291,6 @@ class redmine (
     cwd         => $redmine::install_dir,
     path        => $path,
     environment => ["HOME=$redmine::user_home"],
-    #refreshonly => true,
     require     => Exec['Update gems environment bundler'],
     notify      => Exec['Generate secret token'],
   }
@@ -317,14 +315,15 @@ class redmine (
     refreshonly => true,
   }
 
-  exec { 'Insert default data set':
-    command     => 'bundle exec rake redmine::load_default_data',
-    user        => $redmine::user,
-    cwd         => $redmine::install_dir,
-    path        => $path,
-    environment => [ 'RAILS_ENV=production', 'REDMINE_LANG=en' ],
-    refreshonly => true,
-  }
+#  TODO: create a boolean for this.  for now, don't load data
+#  exec { 'Insert default data set':
+#    command     => 'bundle exec rake redmine::load_default_data',
+#    user        => $redmine::user,
+#    cwd         => $redmine::install_dir,
+#    path        => $path,
+#    environment => [ 'RAILS_ENV=production', 'REDMINE_LANG=en' ],
+#    refreshonly => true,
+#  }
 
   # Setup webserver
   if $redmine::webserver_type != undef {
