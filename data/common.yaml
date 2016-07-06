@@ -24,6 +24,9 @@ redmine::email_delivery: 'sendmail'
 redmine::smtp_domain: 'example.net'
 redmine::smtp_server: 'localhost'
 redmine::plugins: 'undef'
+redmine::plugin_repo: 'undef'
+redmine::plugin_repo_proto: 'undef'
+redmine::plugin_repo_creds: 'undef'
 #redmine::ssl: true
 redmine::ssl: false
 redmine::ssl_protocol: 'All -SSLv2 -SSLv3'
