@@ -116,7 +116,7 @@ class redmine (
   String $email_delivery,
   String $smtp_domain,
   String $smtp_server,
-  String $plugins,
+  Hash $plugins,
   String $version,
   String $ruby_version,
   String $passenger_version,
@@ -140,6 +140,9 @@ class redmine (
   String $config_file_group,
   String $db_config_file,
   String $install_url_base,
+  String $plugin_repo,
+  String $plugin_repo_proto,
+  String $plugin_repo_creds,
   ) {
 
 
@@ -313,6 +316,7 @@ class redmine (
     path        => $path,
     environment => ["HOME=$redmine::user_home",'RAILS_ENV=production' ],
     refreshonly => true,
+    require     => Exec['Generate secret token'],
   }
 
 #  TODO: create a boolean for this.  for now, don't load data
