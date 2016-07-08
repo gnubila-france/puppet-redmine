@@ -1,4 +1,5 @@
 ---
+redmine::bundle_without: 'development:test'
 redmine::db_type: 'mysql'
 redmine::db_adapter: 'mysql2'
 redmine::db_name: 'redmine'
@@ -17,7 +18,7 @@ redmine::passenger_version: '4.0.48'
 redmine::user: 'redmine'
 redmine::group: 'redmine'
 redmine::user_home: '/home/redmine'
-#redmine::install_dir: '%{redmine::user_home}/redmine'
+#redmine::install_dir: "%{redmine::user_home}/redmine"
 redmine::install_dir: '/home/redmine/redmine'
 redmine::install_deps: true
 redmine::email_delivery: 'sendmail'
@@ -27,7 +28,6 @@ redmine::plugins: 'undef'
 redmine::plugin_repo: 'undef'
 redmine::plugin_repo_proto: 'undef'
 redmine::plugin_repo_creds: 'undef'
-#redmine::ssl: true
 redmine::ssl: false
 redmine::ssl_protocol: 'All -SSLv2 -SSLv3'
 redmine::ssl_cipher_suite: 'HIGH:!aNULL:!MD5'
