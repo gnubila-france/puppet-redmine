@@ -206,7 +206,6 @@ class redmine (
     path    => "${redmine::user_home}/redmine",
     require => Puppi::Netinstall['redmine'],
     notify  => File['redmine.conf'],
-    #notify  => Exec['gem install bundler'],
   }
 
   file { 'redmine.conf':
@@ -220,6 +219,7 @@ class redmine (
     replace => $redmine::manage_file_replace,
     audit   => $redmine::manage_audit,
     noop    => $redmine::bool_noops,
+    notify  => File['redmine-database.conf'],
   }
 
   file { 'redmine-database.conf':
@@ -263,7 +263,7 @@ class redmine (
     include redmine::dependencies
   }
 
-  # Setup database
+  # set up database
   include "redmine::${redmine::db_type}"
 
   $path = [
