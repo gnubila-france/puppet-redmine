@@ -183,6 +183,8 @@ class redmine (
     default   => template($redmine::db_template),
   }
 
+  $gemenv = hiera('redmine::gemenv')
+
   ### Managed resources
   user { $redmine::user:
     ensure     => 'present',
@@ -233,8 +235,6 @@ class redmine (
     replace => $redmine::manage_file_replace,
     audit   => $redmine::manage_audit,
     noop    => $redmine::bool_noops,
-    #notify  => Exec['gem install bundler'],
-    #notify      => Exec['Update gems environment bundler'],
     notify      => Exec['Install gems using bundler'],
   }
 
@@ -271,44 +271,24 @@ class redmine (
     '/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin',
   ]
 
-#  exec { 'gem install bundler':
-#    command     => 'gem install bundler --no-rdoc --no-ri',
-#    user        => $redmine::user,
-#    cwd         => $redmine::user_home,
-#    path        => $path,
-#    environment => ["HOME=$redmine::user_home"],
-#    require     => User["$redmine::user"],
-#    notify      => Exec['Update gems environment bundler'],
-#  }
-
-#  exec { 'Update gems environment bundler':
-#    command     => 'bundle update',
-#    user        => $redmine::user,
-#    cwd         => $redmine::install_dir,
-#    path        => $path,
-#    environment => ["HOME=$redmine::user_home"],
-#    #require     => Exec['gem install bundler'],
-#    notify      => Exec['Install gems using bundler'],
-#  }
+  exec { 'gem install bundler':
+    command     => 'gem install bundler --no-rdoc --no-ri',
+    user        => $redmine::user,
+    cwd         => $redmine::user_home,
+    path        => $path,
+    environment => $gemenv,
+    require     => User["$redmine::user"],
+    notify      => Exec['Install gems using bundler'],
+  }
 
   exec { 'Install gems using bundler':
-    #command     => "bundle install --path ${redmine::user_home}/.gem --without development test",
-    # TEMP - need to pass this in
-    command     => "bundle install --path ${redmine::user_home}/.gem --without development:test:xapian",
+    command     => "bundle install --path ${redmine::user_home}/.gem",
     user        => $redmine::user,
     cwd         => $redmine::install_dir,
     path        => $path,
-    #environment => ["HOME=$redmine::user_home"],
-    #require     => Exec['Update gems environment bundler'],
+    environment => $gemenv,
+    require     => Exec['gem install bundler'],
     notify      => Exec['Generate secret token'],
-    environment => [
-      "HOME=$redmine::user_home",
-      "RAILS_ENV=production",
-      "RACK_ENV=production",
-      "DB_ADAPTER=mysql2",
-      "BUNDLE_WITHOUT=development:test:xapian",
-      "GEM_OPTIONS=--no-rdoc --no-ri"
-    ],
   }
 
 
@@ -317,18 +297,10 @@ class redmine (
     user        => $redmine::user,
     cwd         => $redmine::install_dir,
     path        => $path,
-    #environment => ["HOME=$redmine::user_home"],
+    environment => $gemenv,
     refreshonly => true,
     require     => Exec['Install gems using bundler'],
     notify      => Exec['Run database migration'],
-    environment => [
-      "HOME=$redmine::user_home",
-      "RAILS_ENV=production",
-      "RACK_ENV=production",
-      "DB_ADAPTER=mysql2",
-      "BUNDLE_WITHOUT=development:test:xapian",
-      "GEM_OPTIONS=--no-rdoc --no-ri"
-    ],
   }
 
   exec { 'Run database migration':
@@ -336,17 +308,9 @@ class redmine (
     user        => $redmine::user,
     cwd         => $redmine::install_dir,
     path        => $path,
-    #environment => ["HOME=$redmine::user_home",'RAILS_ENV=production' ],
+    environment => $gemenv,
     refreshonly => true,
     require     => Exec['Generate secret token'],
-    environment => [
-      "HOME=$redmine::user_home",
-      "RAILS_ENV=production",
-      "RACK_ENV=production",
-      "DB_ADAPTER=mysql2",
-      "BUNDLE_WITHOUT=development:test:xapian",
-      "GEM_OPTIONS=--no-rdoc --no-ri"
-    ],
   }
 
 #  TODO: create a boolean for this.  for now, don't load data

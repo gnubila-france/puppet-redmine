@@ -27,7 +27,6 @@ define redmine::plugin (
   String $plugin_repo_proto = $redmine::plugin_repo_proto,
   String $user = $redmine::user,
   String $group = $redmine::group,
-  String $bundle_without = $redmine::bundle_without,
 ) {
   include ::redmine
 
@@ -36,13 +35,7 @@ define redmine::plugin (
     '/bin', '/usr/bin', '/usr/sbin'
   ]
 
-  $gemenv = [
-    # TODO: move these vars to hiera
-    "HOME=$redmine::user_home",
-    "BUNDLE_WITHOUT=xapian",
-    "RAILS_ENV=production",
-    "RACK_ENV=production",
-  ]
+  $gemenv = hiera('redmine::gemenv')
 
   puppi::netinstall { $title:
     url             => "${redmine::plugin_repo_proto}://${redmine::plugin_repo_creds}@${redmine::plugin_repo}/${title}/$version/${title}-${version}.zip",
