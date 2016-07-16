@@ -36,7 +36,7 @@ class redmine::dependencies (
 
   include ::redmine
 
-  package { 'ruby-devel':
+  package { ['ruby-devel','gcc']:
     ensure => present,
   }
 
