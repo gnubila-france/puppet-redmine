@@ -321,7 +321,7 @@ class redmine (
     cwd         => $redmine::install_dir,
     path        => $path,
     environment => $gemenv,
-    require     => Exec['gem install bundler'],
+    require     => Package['bundler'],
     notify      => Exec['Generate secret token'],
   }
 
