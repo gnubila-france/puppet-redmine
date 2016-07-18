@@ -114,9 +114,16 @@ class redmine (
   String $install_dir,
   Boolean $install_deps,
   String $email_delivery,
-  String $smtp_domain,
   String $smtp_server,
+  String $smtp_domain,
+  Integer $smtp_port,
+  String $smtp_authentication,
+  String $smtp_user_name,
+  String $smtp_password,
   Hash $plugins,
+  String $plugin_repo,
+  String $plugin_repo_proto,
+  String $plugin_repo_creds,
   String $version,
   String $ruby_version,
   String $passenger_version,
@@ -140,10 +147,6 @@ class redmine (
   String $config_file_group,
   String $db_config_file,
   String $install_url_base,
-  String $plugin_repo,
-  String $plugin_repo_proto,
-  String $plugin_repo_creds,
-  String $bundle_without,
   ) {
 
 
@@ -151,6 +154,16 @@ class redmine (
   $bool_absent=any2bool($absent)
   $bool_audit_only=any2bool($audit_only)
   $bool_noops=any2bool($noops)
+
+  #if $redmine::delivery_method == 'smtp' {
+  #  $email_delivery = 'smtp'
+  #  $smtp_server = $redmine::smtp::server
+  #  $smtp_port = $redmine::smtp::port
+  #  $smtp_domain = $redmine::smtp::domain
+  #  $smtp_authentication = redmine::smtp::authentication
+  #  $smtp_user_name = $redmine::smtp::user_name
+  #  $smtp_password = $redmine::smtp::password
+  #}
 
   ### Definition of some variables used in the module
   $manage_file = $redmine::bool_absent ? {
