@@ -85,8 +85,11 @@ default:
     delivery_method: :smtp
     smtp_settings:
       address: <%= @smtp_server %>
-      port: 25
+      port: <%= @smtp_port %>
       domain: <%= @smtp_domain %>
+      authentication: <%= @smtp_authentication %>
+      user_name: <%= @smtp_user_name %>
+      password: <%= @smtp_password %>
 <% else %>
     delivery_method: :sendmail
 <% end %>

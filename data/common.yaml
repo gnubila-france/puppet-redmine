@@ -24,6 +24,12 @@ redmine::install_deps: true
 redmine::email_delivery: 'sendmail'
 redmine::smtp_domain: 'example.net'
 redmine::smtp_server: 'localhost'
+redmine::smtp_server: email-smtp.us-east-1.amazonaws.com
+redmine::smtp_port: 587
+redmine::smtp_domain: devops.geointservices.io
+redmine::smtp_authentication: ':login'
+redmine::smtp_user_name: AKIAJZYDMNKXUYNCUBLA
+redmine::smtp_password: >
 redmine::plugins: 'undef'
 redmine::plugin_repo: 'undef'
 redmine::plugin_repo_proto: 'undef'
