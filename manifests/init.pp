@@ -207,9 +207,11 @@ class redmine (
   }
 
   file { 'redmine_link':
-    ensure  => 'link',
+    ensure  => link,
     target  => "${redmine::user_home}/redmine-${redmine::version}",
     path    => "${redmine::user_home}/redmine",
+    owner   => $redmine::user,
+    group   => $redmine::group,
     require => Puppi::Netinstall['redmine'],
     notify  => File['redmine.conf'],
   }
@@ -353,3 +355,4 @@ class redmine (
 }
 
 # vim: set et sw=2:
+
