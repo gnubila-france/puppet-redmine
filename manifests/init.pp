@@ -147,6 +147,7 @@ class redmine (
   String $config_file_group,
   String $db_config_file,
   String $install_url_base,
+  String $attachments_storage_path,
   ) {
 
 
@@ -254,6 +255,17 @@ class redmine (
       replace => $redmine::manage_file_replace,
       audit   => $redmine::manage_audit,
       noop    => $redmine::bool_noops,
+    }
+  }
+
+  if $redmine::attachments_storage_path and $redmine::attachments_storage_path != '' {
+    file { "$redmine:attachments_storage_path":
+      ensure  => directory,
+      path    => $redmine::attachments_storage_path,
+      owner   => $redmine::user,
+      group   => $redmine::group,
+      require => User["$redmine::user"],
+      recurse => true,
     }
   }
 
