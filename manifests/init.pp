@@ -147,6 +147,7 @@ class redmine (
   String $config_file_group,
   String $db_config_file,
   String $install_url_base,
+  String $attachments_storage_path,
   ) {
 
 
