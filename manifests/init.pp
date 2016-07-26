@@ -258,6 +258,17 @@ class redmine (
     }
   }
 
+  if $redmine::attachments_storage_path and $redmine::attachments_storage_path != '' {
+    file { "$redmine:attachments_storage_path":
+      ensure  => directory,
+      path    => $redmine::attachments_storage_path,
+      owner   => $redmine::user,
+      group   => $redmine::group,
+      require => User["$redmine::user"],
+      recurse => true,
+    }
+  }
+
   ### Include custom class if $my_class is set
   if $redmine::my_class and $redmine::my_class != '' {
     include $redmine::my_class
