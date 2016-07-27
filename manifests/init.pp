@@ -189,6 +189,12 @@ class redmine (
 
   $gemenv = hiera('redmine::gemenv')
 
+  $path = [
+    "${redmine::user_home}/bin",
+    '/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin',
+  ]
+
+
   ### Managed resources
   user { $redmine::user:
     ensure     => 'present',
@@ -261,12 +267,20 @@ class redmine (
   }
 
   if $redmine::attachments_storage_path and $redmine::attachments_storage_path != '' {
+    exec { "parents_of_attachments_storage_path": 
+      command => "mkdir -p $redmine::attachments_storage_path 2> /dev/null",
+      path    => $path,
+      creates => $redmine::attachments_storage_path,
+      require => User["$redmine::user"],
+      notify  => File["$redmine:attachments_storage_path"],
+    }
+
     file { "$redmine:attachments_storage_path":
       ensure  => directory,
       path    => $redmine::attachments_storage_path,
       owner   => $redmine::user,
       group   => $redmine::group,
-      require => User["$redmine::user"],
+      require => Exec["parents_of_attachments_storage_path"],
       recurse => true,
     }
   }
@@ -282,11 +296,6 @@ class redmine (
 
   # set up database
   include "redmine::${redmine::db_type}"
-
-  $path = [
-    "${redmine::user_home}/bin",
-    '/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin',
-  ]
 
   exec { 'gem install bundler':
     command     => 'gem install bundler --no-rdoc --no-ri',
