@@ -203,6 +203,14 @@ class redmine (
     shell      => '/bin/bash',
   }
 
+  file { $redmine::user_home:
+    ensure => directory,
+    owner  => $redmine::user,
+    group  => $redmine::group,
+    mode   => '0755',
+    require => User["$redmine::user"],
+  }
+
   $src_url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
   puppi::netinstall { 'redmine':
     url             => $src_url,
