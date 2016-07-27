@@ -1,5 +1,5 @@
 ---
-redmine::bundle_without: 'development:test'
+redmine::gemenv: ''
 redmine::db_type: 'mysql'
 redmine::db_adapter: 'mysql2'
 redmine::db_name: 'redmine'

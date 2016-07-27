@@ -153,6 +153,8 @@ class redmine::apache {
     servername           => "${::redmine::server_name}",
     port                 => '80',
     docroot              => '/var/www/redirect',
+    docroot_owner        => "$::redmine::user",
+    docroot_group        => "$::redmine::group",
     redirect_status      => 'permanent',
     redirect_dest        => "https://${::redmine::server_name}/",
   }
@@ -162,6 +164,8 @@ class redmine::apache {
     port                 => '443',
     serveraliases        => $::redmine::serveraliases,
     docroot              => $docroot,
+    docroot_owner        => "$::redmine::user",
+    docroot_group        => "$::redmine::group",
     directories          => [
       {
         path              => $docroot,
