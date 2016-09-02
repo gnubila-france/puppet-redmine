@@ -3,7 +3,7 @@
   "version": "0.0.5",
   "author": "Baptiste Grenier <bgrenier@gnubila.fr>",
   "license": "MIT",
-  "summary": "Multi redmine setup with mysql, apache and rbenv",
+  "summary": "Multi redmine setup with mysql and apache",
 
   "source": "https://github.com/gnubila-france/puppet-redmine",
   "project_page": "https://github.com/gnubila-france/puppet-redmine",
@@ -39,7 +39,6 @@
 
   "dependencies": [
     { "name": "example42/puppi", "version_requirement": ">= 2.1.14" },
-    { "name": "alup/rbenv", "version_requirement": ">= 1.2.0" },
     { "name": "puppetlabs/stdlib", "version_requirement": ">= 4.9.0" },
     { "name": "puppetlabs/mysql", "version_requirement": ">= 3.6.1" },
     { "name": "puppetlabs/apache", "version_requirement": ">= 1.6.0" },
