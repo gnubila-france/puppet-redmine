@@ -65,7 +65,7 @@ define redmine::plugin (
     path        => $path,
     environment => $gemenv,
     refreshonly => true,
-    require     => Exec["Install gems using bundler for plugin ${title}"],
+    require     => [ Exec["Install gems using bundler for plugin ${title}"], Class["redmine::${redmine::db_type}"] ],
     notify      => Exec["Run plugin migration for plugin ${title}"],
   }
 

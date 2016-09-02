@@ -255,7 +255,7 @@ class redmine (
     replace => $redmine::manage_file_replace,
     audit   => $redmine::manage_audit,
     noop    => $redmine::bool_noops,
-    notify      => Exec['Install gems using bundler'],
+    notify  => Class["redmine::${redmine::db_type}"],
   }
 
   # The whole redmine configuration directory can be recursively overriden
@@ -344,7 +344,7 @@ class redmine (
     path        => $path,
     environment => $gemenv,
     refreshonly => true,
-    require     => Exec['Generate secret token'],
+    require     => [ Exec['Install gems using bundler'], Class["redmine::${redmine::db_type}"] ],
   }
 
 #  TODO: create a boolean for this.  for now, don't load data
