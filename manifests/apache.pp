@@ -36,6 +36,10 @@
 #
 class redmine::apache {
 
+
+  class  {'apache': default_vhost => false, }
+  $docroot = "${redmine::install_dir}/public/"
+
   include ::redmine
   include ::apache
   include ::apache::mod::passenger
@@ -43,7 +47,7 @@ class redmine::apache {
   if $::redmine::ssl {
 
     include ::apache::mod::ssl
-
+  
     # it seems that there should be a better way to choose between 'content' and 'source' attributes.
     # any suggestions?
     if  $::redmine::ssl_cert_content != 'undef'  {
@@ -140,53 +144,70 @@ class redmine::apache {
         }
       }
     }
-  }
 
-  $path = [
-    "${::redmine::user_home}/bin",
-    '/bin', '/usr/bin', '/usr/sbin'
-  ]
+    apache::vhost { "${::redmine::server_name}-redirect":
+      servername           => "${::redmine::server_name}",
+      port                 => '80',
+      docroot              => '/var/www/redirect',
+      docroot_owner        => "$::redmine::user",
+      docroot_group        => "$::redmine::group",
+      redirect_status      => 'permanent',
+      redirect_dest        => "https://${::redmine::server_name}/",
+    }
+  
+    apache::vhost { "${::redmine::server_name}-SSL":
+      servername           => "${::redmine::server_name}",
+      port                 => '443',
+      serveraliases        => $::redmine::serveraliases,
+      docroot              => $docroot,
+      docroot_owner        => "$::redmine::user",
+      docroot_group        => "$::redmine::group",
+      directories          => [
+        {
+          path              => $docroot,
+          provider          => 'directory',
+          order             => 'allow,deny',
+          allow             => 'from all',
+          options           => ['Indexes','ExecCGI','FollowSymLinks'],
+          override          => ['All'],
+          passenger_enabled => 'on',
+        },
+      ],
+      ssl                  => $::redmine::ssl,
+      ssl_cert             => $::redmine::ssl_cert,
+      ssl_key              => $::redmine::ssl_cert_key,
+      ssl_protocol         => $::redmine::ssl_protocol,
+      ssl_cipher           => $::redmine::ssl_cipher_suite,
+      ssl_honorcipherorder => 'On',
+      require              => File['redmine_link'],
 
-  $docroot = "${redmine::install_dir}/public/"
+    }
 
-  apache::vhost { "${::redmine::server_name}-redirect":
-    servername           => "${::redmine::server_name}",
-    port                 => '80',
-    docroot              => '/var/www/redirect',
-    docroot_owner        => "$::redmine::user",
-    docroot_group        => "$::redmine::group",
-    redirect_status      => 'permanent',
-    redirect_dest        => "https://${::redmine::server_name}/",
-  }
+  } else {
 
-  apache::vhost { "${::redmine::server_name}-SSL":
-    servername           => "${::redmine::server_name}",
-    port                 => '443',
-    serveraliases        => $::redmine::serveraliases,
-    docroot              => $docroot,
-    docroot_owner        => "$::redmine::user",
-    docroot_group        => "$::redmine::group",
-    directories          => [
-      {
-        path              => $docroot,
-        provider          => 'directory',
-        order             => 'allow,deny',
-        allow             => 'from all',
-        options           => ['Indexes','ExecCGI','FollowSymLinks'],
-        override          => ['All'],
-        passenger_enabled => 'on',
-      },
-    ],
-    ssl                  => $::redmine::ssl,
-    ssl_cert             => $::redmine::ssl_cert,
-    ssl_key              => $::redmine::ssl_cert_key,
-    #ssl_chain            => $::redmine::ssl_ca_cert_chain,
-    #ssl_ca               => $::redmine::ssl_ca_cert,
-    ssl_protocol         => $::redmine::ssl_protocol,
-    ssl_cipher           => $::redmine::ssl_cipher_suite,
-    ssl_honorcipherorder => 'On',
-    require              => File['redmine_link']
-  }
+    apache::vhost { "${::redmine::server_name}":
+      servername           => "${::redmine::server_name}",
+      port                 => '80',
+      require              => File['redmine_link'],
+      serveraliases        => $::redmine::serveraliases,
+      docroot              => $docroot,
+      docroot_owner        => "$::redmine::user",
+      docroot_group        => "$::redmine::group",
+      directories          => [
+        {
+          path              => $docroot,
+          provider          => 'directory',
+          order             => 'allow,deny',
+          allow             => 'from all',
+          options           => ['Indexes','ExecCGI','FollowSymLinks'],
+          override          => ['All'],
+          passenger_enabled => 'on',
+        },
+      ],
+    } 
+
+  } 
 }
+
 
 # vim: set et sw=2:
