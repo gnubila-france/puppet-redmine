@@ -311,7 +311,6 @@ class redmine (
     cwd         => $redmine::user_home,
     path        => $path,
     environment => $gemenv,
-    refreshonly => true,
     require     => User["$redmine::user"],
     notify      => Exec['Install gems using bundler'],
   }
@@ -322,7 +321,6 @@ class redmine (
     cwd         => $redmine::install_dir,
     path        => $path,
     environment => $gemenv,
-    refreshonly => true,
     require     => Exec['gem install bundler'],
     notify      => Exec['Generate secret token'],
   }
