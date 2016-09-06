@@ -280,10 +280,10 @@ class redmine (
       path    => $path,
       creates => $redmine::attachments_storage_path,
       require => User["$redmine::user"],
-      notify  => File["$redmine:attachments_storage_path"],
+      notify  => File["$redmine::attachments_storage_path"],
     }
 
-    file { "$redmine:attachments_storage_path":
+    file { "$redmine::attachments_storage_path":
       ensure  => directory,
       path    => $redmine::attachments_storage_path,
       owner   => $redmine::user,
