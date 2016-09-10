@@ -36,15 +36,16 @@ define redmine::plugin (
   ]
 
   $gemenv = hiera('redmine::gemenv')
+  $appdir = "${redmine::user_home}/redmine-${redmine::version}"
 
   puppi::netinstall { $title:
     url             => "${redmine::plugin_repo_proto}://${redmine::plugin_repo_creds}@${redmine::plugin_repo}/${title}/$version/${title}-${version}.zip",
-    destination_dir => "${redmine::user_home}/redmine-${redmine::version}/plugins/",
-    extracted_dir   => "$title",
-    owner           => $user,
-    group           => $group,
-    notify          => Exec["Install gems using bundler for plugin ${title}"],
-    require         => File['redmine-database.conf'],
+    destination_dir     => "$appdir/plugins/",
+    extracted_dir       => "$title",
+    owner               => $user,
+    group               => $group,
+    notify              => Exec["Install gems using bundler for plugin ${title}"],
+    require             => File['redmine-database.conf'],
   }
 
   exec { "Install gems using bundler for plugin ${title}":
@@ -78,6 +79,23 @@ define redmine::plugin (
     refreshonly => true,
     require     => Exec["update db schema for plugin ${title}"],
   }
+
+  file { "$appdir/plugins/$title":
+    require => Exec["Run plugin migration for plugin ${title}"],
+    recurse => true,
+    owner   => $user,
+    group   => $user,
+    mode    => "0644",
+  }
+
+  file { "$appdir/public/plugin_assets/$title":
+    require => Exec["Run plugin migration for plugin ${title}"],
+    recurse => true,
+    owner   => $user,
+    group   => $user,
+    mode    => "0644",
+  }
+
 
 }
 
