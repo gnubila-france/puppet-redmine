@@ -305,16 +305,6 @@ class redmine (
   # set up database
   include "redmine::${redmine::db_type}"
 
-  $path = [
-    "${redmine::user_home}/bin",
-    '/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin',
-  ]
-
-  package { 'bundler':
-    ensure   => installed,
-    provider => gem,
-  }
-
   exec { 'Install gems using bundler':
     command     => "bundle install --path ${redmine::user_home}/.gem",
     user        => $redmine::user,
