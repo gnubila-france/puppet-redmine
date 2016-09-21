@@ -36,10 +36,6 @@ class redmine::dependencies (
 
   include ::redmine
 
-  package { ['ruby-devel','gcc']:
-    ensure => present,
-  }
-
   package { $redmine::dependencies::pname_passenger: ensure => 'present' }
   package { $redmine::dependencies::pname_mod_passenger: ensure => 'present' }
 
