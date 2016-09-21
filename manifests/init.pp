@@ -305,14 +305,14 @@ class redmine (
   # set up database
   include "redmine::${redmine::db_type}"
 
-  exec { 'gem install bundler':
-    command     => 'gem install bundler --no-rdoc --no-ri',
-    user        => $redmine::user,
-    cwd         => $redmine::user_home,
-    path        => $path,
-    environment => $gemenv,
-    require     => User["$redmine::user"],
-    notify      => Exec['Install gems using bundler'],
+  $path = [
+    "${redmine::user_home}/bin",
+    '/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin',
+  ]
+
+  package { 'bundler':
+    ensure   => installed,
+    provider => gem,
   }
 
   exec { 'Install gems using bundler':
@@ -321,7 +321,7 @@ class redmine (
     cwd         => $redmine::install_dir,
     path        => $path,
     environment => $gemenv,
-    require     => Exec['gem install bundler'],
+    require     => Package['bundler'],
     notify      => Exec['Generate secret token'],
   }
 

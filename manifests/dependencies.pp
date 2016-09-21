@@ -36,11 +36,8 @@ class redmine::dependencies (
 
   include ::redmine
 
-  file { '/etc/yum.repos.d/passenger.repo':
-    source => [
-      "https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo",
-      "puppet:///files/repos/passenger.repo",
-    ]
+  package { ['ruby-devel','gcc']:
+    ensure => present,
   }
 
   package { $redmine::dependencies::pname_passenger: ensure => 'present' }
