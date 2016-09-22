@@ -34,8 +34,9 @@
 #
 # Copyright 2015 gnúbila
 #
-class redmine::apache {
-
+class redmine::apache (
+    $yum_url = undef,
+) {
 
   class  {'apache': default_vhost => false, }
   $docroot = "${redmine::install_dir}/public/"
@@ -44,10 +45,21 @@ class redmine::apache {
   include ::apache
   include ::apache::mod::passenger
 
+  if $yum_url and !defined(Yumrepo['passenger']) {
+    yumrepo { 'passenger':
+      baseurl    => $yum_url,
+      descr      => 'The passenger repository',
+      enabled    => '1',
+      gpgcheck   => '0',
+      mirrorlist => '',
+      before     => Apache::Mod['passenger']
+    }
+  }
+
   if $::redmine::ssl {
 
     include ::apache::mod::ssl
-  
+
     # it seems that there should be a better way to choose between 'content' and 'source' attributes.
     # any suggestions?
     if  $::redmine::ssl_cert_content != 'undef'  {
@@ -154,7 +166,7 @@ class redmine::apache {
       redirect_status      => 'permanent',
       redirect_dest        => "https://${::redmine::server_name}/",
     }
-  
+
     apache::vhost { "${::redmine::server_name}-SSL":
       servername           => "${::redmine::server_name}",
       port                 => '443',
@@ -204,9 +216,9 @@ class redmine::apache {
           passenger_enabled => 'on',
         },
       ],
-    } 
+    }
 
-  } 
+  }
 }
 
 
