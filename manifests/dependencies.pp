@@ -36,6 +36,14 @@ class redmine::dependencies (
 
   include ::redmine
 
+  ['ruby-devel','gcc'].each |String $pkg| {
+    if !defined(Package[$pkg]) {
+      package { $pkg:
+        ensure => present,
+      }
+    }
+  }
+
   package { $redmine::dependencies::pname_passenger: ensure => 'present' }
   package { $redmine::dependencies::pname_mod_passenger: ensure => 'present' }
 
