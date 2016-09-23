@@ -36,6 +36,12 @@ class redmine::dependencies (
 
   include ::redmine
 
+  if !defined(Package['bundler']) {
+    package { 'bundler':
+      ensure => installed,
+    }
+  }
+
   ['ruby-devel','gcc'].each |String $pkg| {
     if !defined(Package[$pkg]) {
       package { $pkg:
@@ -43,12 +49,6 @@ class redmine::dependencies (
       }
     }
   }
-
-  package { $redmine::dependencies::pname_passenger: ensure => 'present' }
-  package { $redmine::dependencies::pname_mod_passenger: ensure => 'present' }
-
-  package { $redmine::dependencies::pname_imagemagick: ensure => 'present' }
-  package { $redmine::dependencies::pname_imagemagick_dev: ensure => 'present' }
 
   case $redmine::db_type {
     /^mysql/: {
@@ -68,6 +68,15 @@ class redmine::dependencies (
     package { $redmine::dependencies::pname_apr_dev: ensure => 'present' }
     package { $redmine::dependencies::pname_apr_util_dev: ensure => 'present' }
   }
+
+  include "redmine::${redmine::webserver_type}"
+
+  package { $redmine::dependencies::pname_passenger: ensure => 'present' }
+  package { $redmine::dependencies::pname_mod_passenger: ensure => 'present' }
+
+  package { $redmine::dependencies::pname_imagemagick: ensure => 'present' }
+  package { $redmine::dependencies::pname_imagemagick_dev: ensure => 'present' }
+
 }
 
 # vim: set et sw=2:

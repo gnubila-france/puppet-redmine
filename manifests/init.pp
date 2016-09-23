@@ -120,7 +120,7 @@ class redmine (
   String $smtp_authentication,
   String $smtp_user_name,
   String $smtp_password,
-  Hash $plugins,
+  Hash $plugins = '',
   String $plugin_repo,
   String $plugin_repo_proto,
   String $plugin_repo_creds,
@@ -194,6 +194,10 @@ class redmine (
     '/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin',
   ]
 
+  if $redmine::install_deps {
+    include redmine::dependencies
+    Class['redmine::dependencies'] ~> Class['redmine']
+  }
 
   ### Managed resources
   user { $redmine::user:
@@ -298,18 +302,8 @@ class redmine (
     include $redmine::my_class
   }
 
-  if $redmine::install_deps {
-    include redmine::dependencies
-  }
-
   # set up database
   include "redmine::${redmine::db_type}"
-
-  if !defined(Package['bundler']) {
-    package { 'bundler':
-      ensure => installed,
-    }
-  }
 
   exec { 'Install gems using bundler':
     command     => "bundle install --path ${redmine::user_home}/.gem",
@@ -320,7 +314,6 @@ class redmine (
     require     => Class['devops::ruby'],
     notify      => Exec['Generate secret token'],
   }
-
 
   exec { 'Generate secret token':
     command     => 'bundle exec rake generate_secret_token',
@@ -353,16 +346,17 @@ class redmine (
 #    refreshonly => true,
 #  }
 
-  # Setup webserver
-  if $redmine::webserver_type != undef {
-    include "redmine::${redmine::webserver_type}"
-
-    Class["::redmine::${redmine::db_type}"]->
-    Class["::redmine::${redmine::webserver_type}"]
-  }
+  ## Setup webserver
+  #if $redmine::webserver_type != undef {
+  #  #include "redmine::${redmine::webserver_type}"
+  #  Class["::redmine::${redmine::db_type}"]->
+  #  Class["::redmine::${redmine::webserver_type}"] 
+  #}
 
   if $redmine::plugins != undef and is_hash($redmine::plugins) {
     create_resources('::redmine::plugin', $redmine::plugins)
+    #include "::redmine::plugin"
+    #Class["redmine"] ~> Class["redmine::plugin"] 
   }
 
 }
