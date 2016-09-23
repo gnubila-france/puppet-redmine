@@ -32,7 +32,7 @@ define redmine::plugin (
 
   $path = [
     "${redmine::user_home}/bin", 
-    '/bin', '/usr/bin', '/usr/sbin'
+    '/bin', '/usr/bin', '/usr/sbin', '/usr/local/bin'
   ]
 
   $gemenv = hiera('redmine::gemenv')
