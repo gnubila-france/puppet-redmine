@@ -48,8 +48,8 @@ redmine::install_url_base: 'http://www.redmine.org/releases'
 redmine::config_dir: "%{hiera('redmine::install_dir')}/config/"
 redmine::config_file: "%{hiera('redmine::config_dir')}/configuration.yml"
 redmine::config_file_mode: '0644'
-redmine::config_file_owner: "%{hiera('redmine::owner')"
-redmine::config_file_group: "%{hiera('redmine::owner')"
+redmine::config_file_owner: "%{hiera('redmine::user')}"
+redmine::config_file_group: "%{hiera('redmine::group')}"
 redmine::db_config_file: "%{hiera('redmine::config_dir')}/database.yml"
 redmine::my_class: ''
 redmine::source: ''
