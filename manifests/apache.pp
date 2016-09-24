@@ -48,10 +48,9 @@ class redmine::apache (
   if $yum_url and !defined(Yumrepo['passenger']) {
     yumrepo { 'passenger':
       baseurl    => $yum_url,
-      descr      => 'The passenger repository',
+      descr      => 'passenger',
       enabled    => '1',
       gpgcheck   => '0',
-      mirrorlist => '',
       before     => Apache::Mod['passenger']
     }
   }
