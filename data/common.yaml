@@ -45,6 +45,7 @@ redmine::ssl_ca_cert_content: ''
 redmine::ssl_cert_content: ''
 redmine::ssl_cert_key_content: ''
 redmine::install_url_base: 'http://www.redmine.org/releases'
+redmine::rubygems_mirror: ''
 redmine::config_dir: "%{hiera('redmine::install_dir')}/config/"
 redmine::config_file: "%{hiera('redmine::config_dir')}/configuration.yml"
 redmine::config_file_mode: '0644'
@@ -57,6 +58,7 @@ redmine::source_dir: ''
 redmine::source_dir_purge: false
 redmine::template: 'redmine/configuration.yml.erb'
 redmine::db_template: 'redmine/database.yml.erb'
+redmine::bundle_config_template: 'redmine/bundle_config.yml.erb'
 redmine::options: ''
 redmine::version: 'present'
 redmine::absent: false

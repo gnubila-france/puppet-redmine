@@ -136,6 +136,7 @@ class redmine (
   Boolean $source_dir_purge,
   String $template,
   String $db_template,
+  String $bundle_config_template,
   String $options,
   Boolean $absent,
   Boolean $audit_only,
@@ -147,6 +148,7 @@ class redmine (
   String $config_file_group,
   String $db_config_file,
   String $install_url_base,
+  String $rubygems_mirror = undef,
   String $attachments_storage_path,
   ) {
 
@@ -305,6 +307,29 @@ class redmine (
   # set up database
   include "redmine::${redmine::db_type}"
 
+  # manage rubygems mirror in .bundle/config
+  if $redmine::rubygems_mirror != '' {
+
+    file { "$redmine::install_dir/.bundle":
+      ensure => directory,
+      owner  => $redmine::user,
+      group  => $redmine::group,
+      mode   => '0750',
+      require => File["$redmine::install_dir"],
+    }
+
+    file { "$redmine::install_dir/.bundle/config":
+      ensure => file,
+      owner  => $redmine::user,
+      group  => $redmine::group,
+      mode   => '0640',
+      require => File["$redmine::install_dir/.bundle"],
+      content => template("$redmine::bundle_config_template"),
+      before => Exec['Install gems using bundler'],
+    }
+
+  }
+
   exec { 'Install gems using bundler':
     command     => "bundle install --path ${redmine::user_home}/.gem",
     user        => $redmine::user,
@@ -346,17 +371,8 @@ class redmine (
 #    refreshonly => true,
 #  }
 
-  ## Setup webserver
-  #if $redmine::webserver_type != undef {
-  #  #include "redmine::${redmine::webserver_type}"
-  #  Class["::redmine::${redmine::db_type}"]->
-  #  Class["::redmine::${redmine::webserver_type}"] 
-  #}
-
   if $redmine::plugins != undef and is_hash($redmine::plugins) {
     create_resources('::redmine::plugin', $redmine::plugins)
-    #include "::redmine::plugin"
-    #Class["redmine"] ~> Class["redmine::plugin"] 
   }
 
 }
