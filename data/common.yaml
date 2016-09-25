@@ -18,22 +18,17 @@ redmine::passenger_version: '4.0.48'
 redmine::user: 'redmine'
 redmine::group: 'redmine'
 redmine::user_home: '/home/redmine'
-#redmine::install_dir: "%{redmine::user_home}/redmine"
-redmine::install_dir: '/home/redmine/redmine'
+redmine::install_dir: "%{hiera('redmine::user_home')}/redmine"
 redmine::install_deps: true
 redmine::email_delivery: 'sendmail'
 redmine::smtp_domain: 'example.net'
 redmine::smtp_server: 'localhost'
-redmine::smtp_server: ''
 redmine::smtp_port: 25
-redmine::smtp_domain: ''
 redmine::smtp_authentication: ':login'
 redmine::smtp_user_name: ''
 redmine::smtp_password: ''
 redmine::plugins: ''
 redmine::plugin_repo: ''
-redmine::plugin_repo_proto: ''
-redmine::plugin_repo_creds: ''
 redmine::ssl: false
 redmine::ssl_protocol: 'All -SSLv2 -SSLv3'
 redmine::ssl_cipher_suite: 'HIGH:!aNULL:!MD5'
@@ -50,17 +45,12 @@ redmine::ssl_ca_cert_content: ''
 redmine::ssl_cert_content: ''
 redmine::ssl_cert_key_content: ''
 redmine::install_url_base: 'http://www.redmine.org/releases'
-#redmine::config_dir: '%{redmine::install_dir}/config'
-redmine::config_dir: '/home/redmine/redmine/config'
-#redmine::config_file: '%{redmine::config_dir}/configuration.yml'
-redmine::config_file: '/home/redmine/redmine/config/configuration.yml'
+redmine::config_dir: "%{hiera('redmine::install_dir')}/config/"
+redmine::config_file: "%{hiera('redmine::config_dir')}/configuration.yml"
 redmine::config_file_mode: '0644'
-#redmine::config_file_owner: '%{redmine::owner}'
-redmine::config_file_owner: 'redmine'
-#redmine::config_file_group: '%{redmine::group}'
-redmine::config_file_group: 'redmine'
-#redmine::db_config_file: '%{redmine::config_dir}/database.yml'
-redmine::db_config_file: '/home/redmine/redmine/config/database.yml'
+redmine::config_file_owner: "%{hiera('redmine::owner')"
+redmine::config_file_group: "%{hiera('redmine::owner')"
+redmine::db_config_file: "%{hiera('redmine::config_dir')}/database.yml"
 redmine::my_class: ''
 redmine::source: ''
 redmine::source_dir: ''
@@ -74,4 +64,3 @@ redmine::audit_only: false
 redmine::noops: false
 redmine::apache::template_passenger: 'redmine/passenger.erb'
 redmine::attachments_storage_path: ''
-
