@@ -1,5 +1,6 @@
 ---
 redmine::gemenv: ''
+redmine::custom_files_url: ''
 redmine::db_type: 'mysql'
 redmine::db_adapter: 'mysql2'
 redmine::db_name: 'redmine'

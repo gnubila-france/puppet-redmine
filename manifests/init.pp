@@ -150,6 +150,7 @@ class redmine (
   String $install_url_base,
   String $rubygems_mirror = undef,
   String $attachments_storage_path,
+  String $custom_files_url,
   ) {
 
 
@@ -373,6 +374,17 @@ class redmine (
 
   if $redmine::plugins != undef and is_hash($redmine::plugins) {
     create_resources('::redmine::plugin', $redmine::plugins)
+  }
+
+  if $redmine::custom_files_url != '' {
+    puppi::netinstall { 'redmine_custom':
+      url             => $redmine::custom_files_url,
+      destination_dir => $redmine::install_dir,
+      extracted_dir   => '.',
+      owner           => $redmine::user,
+      group           => $redmine::group,
+      require         => Puppi::Netinstall['redmine'],
+    }
   }
 
 }
