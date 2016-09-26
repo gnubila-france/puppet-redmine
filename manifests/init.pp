@@ -378,13 +378,22 @@ class redmine (
 
   if $redmine::custom_files_url != '' {
     puppi::netinstall { 'redmine_custom':
-      url             => $redmine::custom_files_url,
-      destination_dir => $redmine::install_dir,
-      extracted_dir   => '.',
-      owner           => $redmine::user,
-      group           => $redmine::group,
-      require         => Puppi::Netinstall['redmine'],
+      url                 => $redmine::custom_files_url,
+      destination_dir     => "$redmine::install_dir/custom",
+      extracted_dir       => ".",
+      owner               => $redmine::user,
+      group               => $redmine::group,
+      require             => Puppi::Netinstall['redmine'],
     }
+
+    # safety limitation in netinstall prevents going directly to desired target
+    exec { 'rsync custom to app':
+      command  => "/usr/bin/rsync -r $redmine::install_dir/custom/ $redmine::install_dir/",
+      path     => $path,
+      user     => $redmine::user,
+      require  => Puppi::Netinstall['redmine_custom'],
+    }
+
   }
 
 }
