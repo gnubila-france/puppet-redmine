@@ -216,8 +216,15 @@ class redmine::apache (
         },
       ],
     }
-
   }
+
+  # nit security hardening step
+  $sec_filespec = "/etc/httpd /etc/httpd/conf*"
+  exec {'sec_filespec':
+    command  => "/bin/chmod o-rwx $sec_filespec",
+    unless   => "/bin/stat -c '%a' $sec_filespec | grep '0$'",
+  }
+
 }
 
 
