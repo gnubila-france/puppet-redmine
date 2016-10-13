@@ -383,8 +383,7 @@ class redmine (
       extracted_dir       => ".",
       owner               => $redmine::user,
       group               => $redmine::group,
-      require             => Puppi::Netinstall['redmine'],
-      require             => File['redmine_link'];
+      require             => File['redmine_link'],
     }
 
     # safety limitation in netinstall prevents going directly to desired target
