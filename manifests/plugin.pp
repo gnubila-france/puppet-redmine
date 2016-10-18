@@ -31,7 +31,7 @@ define redmine::plugin (
   include ::redmine
 
   $path = [
-    "${redmine::user_home}/bin", 
+    "${redmine::user_home}/bin",
     '/bin', '/usr/bin', '/usr/sbin', '/usr/local/bin'
   ]
 
@@ -39,23 +39,23 @@ define redmine::plugin (
   $appdir = "${redmine::user_home}/redmine-${redmine::version}"
 
   puppi::netinstall { $title:
-    url             => "${redmine::plugin_repo}/${title}/$version/${title}-${version}.zip",
-    destination_dir     => "$appdir/plugins/",
-    extracted_dir       => "$title",
-    owner               => $user,
-    group               => $group,
-    notify              => Exec["Install gems using bundler for plugin ${title}"],
-    require             => File['redmine-database.conf'],
+    url             => "${redmine::plugin_repo}/${title}/${version}/${title}-${version}.zip",
+    destination_dir => "${appdir}/plugins/",
+    extracted_dir   => $title,
+    owner           => $user,
+    group           => $group,
+    notify          => Exec["Install gems using bundler for plugin ${title}"],
+    require         => File['redmine-database.conf'],
   }
 
   exec { "Install gems using bundler for plugin ${title}":
     command     => 'bundle install',
     user        => $user,
-    cwd         => "${redmine::install_dir}",
+    cwd         => $redmine::install_dir,
     path        => $path,
     environment => $gemenv,
     refreshonly => true,
-    require     => Exec["Install gems using bundler"],
+    require     => Exec['Install gems using bundler'],
     notify      => Exec["update db schema for plugin ${title}"],
   }
 
@@ -80,20 +80,20 @@ define redmine::plugin (
     require     => Exec["update db schema for plugin ${title}"],
   }
 
-  file { "$appdir/plugins/$title":
+  file { "${appdir}/plugins/${title}":
     require => Exec["Run plugin migration for plugin ${title}"],
     recurse => true,
     owner   => $user,
     group   => $user,
-    mode    => "0644",
+    mode    => '0644',
   }
 
-  file { "$appdir/public/plugin_assets/$title":
+  file { "${appdir}/public/plugin_assets/${title}":
     require => Exec["Run plugin migration for plugin ${title}"],
     recurse => true,
     owner   => $user,
     group   => $user,
-    mode    => "0644",
+    mode    => '0644',
   }
 
 
