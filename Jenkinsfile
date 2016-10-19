@@ -2,7 +2,7 @@ node ('sl6') {
   def workspace = pwd()
   withEnv(["GEM_HOME=${workspace}", "PATH=${workspace}/bin:$PATH"]) {
     try {
-      git poll:true, url: 'git@github.com:slconley/puppet-redmine.git'
+      git poll:true, url: 'https://github.com/slconley/puppet-redmine.git'
       stage 'Build Setup'
       sh 'gem install bundler'
       sh 'bundle install --deployment'
