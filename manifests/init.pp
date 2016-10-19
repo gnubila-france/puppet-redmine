@@ -120,7 +120,6 @@ class redmine (
   String $smtp_authentication,
   String $smtp_user_name,
   String $smtp_password,
-  Hash $plugins = '',
   String $plugin_repo,
   #String $plugin_repo_proto,
   #String $plugin_repo_creds,
@@ -148,9 +147,10 @@ class redmine (
   String $config_file_group,
   String $db_config_file,
   String $install_url_base,
-  String $rubygems_mirror = undef,
   String $attachments_storage_path,
   String $custom_files_url,
+  Hash $plugins = '',
+  String $rubygems_mirror = undef,
   ) {
 
 
@@ -211,11 +211,11 @@ class redmine (
   }
 
   file { $redmine::user_home:
-    ensure => directory,
-    owner  => $redmine::user,
-    group  => $redmine::group,
-    mode   => '0755',
-    require => User["$redmine::user"],
+    ensure  => directory,
+    owner   => $redmine::user,
+    group   => $redmine::group,
+    mode    => '0755',
+    require => User[$redmine::user],
   }
 
   $src_url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
@@ -282,20 +282,20 @@ class redmine (
   }
 
   if $redmine::attachments_storage_path and $redmine::attachments_storage_path != '' {
-    exec { "parents_of_attachments_storage_path": 
-      command => "mkdir -p $redmine::attachments_storage_path 2> /dev/null",
+    exec { 'parents_of_attachments_storage_path':
+      command => "mkdir -p ${redmine::attachments_storage_path} 2> /dev/null",
       path    => $path,
       creates => $redmine::attachments_storage_path,
-      require => User["$redmine::user"],
-      notify  => File["$redmine::attachments_storage_path"],
+      require => User[$redmine::user],
+      notify  => File[$redmine::attachments_storage_path],
     }
 
-    file { "$redmine::attachments_storage_path":
+    file { $redmine::attachments_storage_path:
       ensure  => directory,
       path    => $redmine::attachments_storage_path,
       owner   => $redmine::user,
       group   => $redmine::group,
-      require => Exec["parents_of_attachments_storage_path"],
+      require => Exec['parents_of_attachments_storage_path'],
       recurse => true,
     }
   }
@@ -311,22 +311,22 @@ class redmine (
   # manage rubygems mirror in .bundle/config
   if $redmine::rubygems_mirror != '' {
 
-    file { "$redmine::install_dir/.bundle":
-      ensure => directory,
-      owner  => $redmine::user,
-      group  => $redmine::group,
-      mode   => '0750',
-      require => File["$redmine::install_dir"],
+    file { "${redmine::install_dir}/.bundle":
+      ensure  => directory,
+      owner   => $redmine::user,
+      group   => $redmine::group,
+      mode    => '0750',
+      require => File[$redmine::install_dir],
     }
 
-    file { "$redmine::install_dir/.bundle/config":
-      ensure => file,
-      owner  => $redmine::user,
-      group  => $redmine::group,
-      mode   => '0640',
-      require => File["$redmine::install_dir/.bundle"],
-      content => template("$redmine::bundle_config_template"),
-      before => Exec['Install gems using bundler'],
+    file { "${redmine::install_dir}/.bundle/config":
+      ensure  => file,
+      owner   => $redmine::user,
+      group   => $redmine::group,
+      mode    => '0640',
+      require => File["${redmine::install_dir}/.bundle"],
+      content => template($redmine::bundle_config_template),
+      before  => Exec['Install gems using bundler'],
     }
 
   }
@@ -378,20 +378,20 @@ class redmine (
 
   if $redmine::custom_files_url != '' {
     puppi::netinstall { 'redmine_custom':
-      url                 => $redmine::custom_files_url,
-      destination_dir     => "$redmine::install_dir/custom",
-      extracted_dir       => ".",
-      owner               => $redmine::user,
-      group               => $redmine::group,
-      require             => File['redmine_link'],
+      url             => $redmine::custom_files_url,
+      destination_dir => "${redmine::install_dir}/custom",
+      extracted_dir   => '.',
+      owner           => $redmine::user,
+      group           => $redmine::group,
+      require         => File['redmine_link'],
     }
 
     # safety limitation in netinstall prevents going directly to desired target
     exec { 'rsync custom to app':
-      command  => "/usr/bin/rsync -r $redmine::install_dir/custom/ $redmine::install_dir/",
-      path     => $path,
-      user     => $redmine::user,
-      require  => Puppi::Netinstall['redmine_custom'],
+      command => "/usr/bin/rsync -r ${redmine::install_dir}/custom/ ${redmine::install_dir}/",
+      path    => $path,
+      user    => $redmine::user,
+      require => Puppi::Netinstall['redmine_custom'],
     }
 
   }
@@ -399,4 +399,3 @@ class redmine (
 }
 
 # vim: set et sw=2:
-

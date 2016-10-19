@@ -47,11 +47,11 @@ class redmine::apache (
 
   if $yum_url and !defined(Yumrepo['passenger']) {
     yumrepo { 'passenger':
-      baseurl    => $yum_url,
-      descr      => 'passenger',
-      enabled    => '1',
-      gpgcheck   => '0',
-      before     => Apache::Mod['passenger']
+      baseurl  => $yum_url,
+      descr    => 'passenger',
+      enabled  => '1',
+      gpgcheck => '0',
+      before   => Apache::Mod['passenger']
     }
   }
 
@@ -92,12 +92,12 @@ class redmine::apache (
 
     if  $::redmine::ssl_cert_key_content != 'undef'  {
       file { $::redmine::ssl_cert_key:
-        ensure => 'file',
-        owner  => $::apache::user,
-        group  => $::apache::group,
-        mode   => '0400',
+        ensure  => 'file',
+        owner   => $::apache::user,
+        group   => $::apache::group,
+        mode    => '0400',
         content => $::redmine::ssl_cert_key_content,
-        notify => Class['::apache::service'],
+        notify  => Class['::apache::service'],
       }
     } else {
       file { $::redmine::ssl_cert_key:
@@ -137,12 +137,12 @@ class redmine::apache (
 
       if  $::redmine::ssl_ca_cert_content != 'undef'  {
         file { $::redmine::ssl_ca_cert_chain:
-          ensure => 'file',
-          owner  => $::apache::user,
-          group  => $::apache::group,
-          mode   => '0640',
+          ensure  => 'file',
+          owner   => $::apache::user,
+          group   => $::apache::group,
+          mode    => '0640',
           content => $::redmine::ssl_ca_cert_chain_content,
-          notify => Class['::apache::service'],
+          notify  => Class['::apache::service'],
         }
       } else {
         file { $::redmine::ssl_ca_cert_chain:
@@ -157,22 +157,22 @@ class redmine::apache (
     }
 
     apache::vhost { "${::redmine::server_name}-redirect":
-      servername           => "${::redmine::server_name}",
-      port                 => '80',
-      docroot              => '/var/www/redirect',
-      docroot_owner        => "$::redmine::user",
-      docroot_group        => "$::redmine::group",
-      redirect_status      => 'permanent',
-      redirect_dest        => "https://${::redmine::server_name}/",
+      servername      => $::redmine::server_name,
+      port            => '80',
+      docroot         => '/var/www/redirect',
+      docroot_owner   => $::redmine::user,
+      docroot_group   => $::redmine::group,
+      redirect_status => 'permanent',
+      redirect_dest   => "https://${::redmine::server_name}/",
     }
 
     apache::vhost { "${::redmine::server_name}-SSL":
-      servername           => "${::redmine::server_name}",
+      servername           => $::redmine::server_name,
       port                 => '443',
       serveraliases        => $::redmine::serveraliases,
       docroot              => $docroot,
-      docroot_owner        => "$::redmine::user",
-      docroot_group        => "$::redmine::group",
+      docroot_owner        => $::redmine::user,
+      docroot_group        => $::redmine::group,
       directories          => [
         {
           path              => $docroot,
@@ -196,15 +196,15 @@ class redmine::apache (
 
   } else {
 
-    apache::vhost { "${::redmine::server_name}":
-      servername           => "${::redmine::server_name}",
-      port                 => '80',
-      require              => File['redmine_link'],
-      serveraliases        => $::redmine::serveraliases,
-      docroot              => $docroot,
-      docroot_owner        => "$::redmine::user",
-      docroot_group        => "$::redmine::group",
-      directories          => [
+    apache::vhost { $::redmine::server_name:
+      servername    => $::redmine::server_name,
+      port          => '80',
+      require       => File['redmine_link'],
+      serveraliases => $::redmine::serveraliases,
+      docroot       => $docroot,
+      docroot_owner => $::redmine::user,
+      docroot_group => $::redmine::group,
+      directories   => [
         {
           path              => $docroot,
           provider          => 'directory',
@@ -219,10 +219,10 @@ class redmine::apache (
   }
 
   # nit security hardening step
-  $sec_filespec = "/etc/httpd /etc/httpd/conf*"
+  $sec_filespec = '/etc/httpd /etc/httpd/conf*'
   exec {'sec_filespec':
-    command  => "/bin/chmod o-rwx $sec_filespec",
-    unless   => "/bin/stat -c '%a' $sec_filespec | grep '0$'",
+    command => "/bin/chmod o-rwx ${sec_filespec}",
+    unless  => "/bin/stat -c '%a' ${sec_filespec} | grep '0$'",
   }
 
 }
