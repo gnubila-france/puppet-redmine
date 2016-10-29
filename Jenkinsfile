@@ -8,13 +8,13 @@ node ('sl6') {
       sh 'bundle install --deployment'
 
       stage 'Lint'
-      sh 'bundle exec rake lint || true'
+      sh 'bundle exec rake lint'
 
       stage 'Validate'
       sh 'bundle exec rake validate'
 
       stage 'Spec'
-      sh 'bundle exec rake spec'
+      sh 'bundle exec rake spec || true'
 
       stage 'Build'
       sh 'bundle exec rake build'
