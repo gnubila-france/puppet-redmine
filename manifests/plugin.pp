@@ -21,10 +21,8 @@
 # Copyright 2015 gnúbila
 #
 define redmine::plugin (
-  String $version,
+  String $url,
   String $plugin_repo = $redmine::plugin_repo,
-  #String $plugin_repo_creds = $redmine::plugin_repo_creds,
-  #String $plugin_repo_proto = $redmine::plugin_repo_proto,
   String $user = $redmine::user,
   String $group = $redmine::group,
 ) {
@@ -39,7 +37,7 @@ define redmine::plugin (
   $appdir = "${redmine::user_home}/redmine-${redmine::version}"
 
   puppi::netinstall { $title:
-    url             => "${redmine::plugin_repo}/${title}/${version}/${title}-${version}.zip",
+    url             => "$url",
     destination_dir => "${appdir}/plugins/",
     extracted_dir   => $title,
     owner           => $user,
