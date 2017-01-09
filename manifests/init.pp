@@ -68,6 +68,12 @@
 # Set and override them only if you know what you're doing.
 # Note also that you can't override/set them via top scope variables.
 #
+# [*account_view_dir*]
+#   Application views account directory 
+#
+# [*login_page_file*]
+#   File used to generate the Redmine login page 
+#
 # [*config_dir*]
 #   Main configuration directory. Used by puppi
 #
@@ -140,6 +146,8 @@ class redmine (
   Boolean $absent,
   Boolean $audit_only,
   Boolean $noops,
+  String $account_view_dir,
+  String $login_page_file,
   String $config_dir,
   String $config_file,
   String $config_file_mode,
@@ -234,8 +242,30 @@ class redmine (
     owner   => $redmine::user,
     group   => $redmine::group,
     require => Puppi::Netinstall['redmine'],
-    notify  => File['redmine.conf'],
+    notify  => File['redmine-login-dialog'],
   }
+
+  file { 'redmine-login-dialog':
+    ensure => present,
+    path   => $redmine::login_page_file,
+    notify  => File['redmine-pki-partial'],
+  }->
+  file_line { 'Move username/login dialog to bottom of page':
+    path  => $redmine::login_page_file,
+    line  => '<%= call_hook :view_account_login_bottom %>',
+    match => ".*_login_top.*",
+  } 
+
+  file { 'redmine-pki-partial':
+    ensure => present,
+    path   => $redmine::login_page_file,
+    notify  => File['redmine.conf'],
+  }->
+  file_line { 'Make call to display pki partial at the top of the page':
+    path  => $redmine::login_page_file,
+    line  => '<%= call_hook :view_account_login_top %>',
+    match => ".*_login_bottom.*$",
+  } 
 
   file { 'redmine.conf':
     ensure  => $redmine::manage_file,
