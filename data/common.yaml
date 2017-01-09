@@ -19,7 +19,7 @@ redmine::passenger_version: '4.0.48'
 redmine::user: 'redmine'
 redmine::group: 'redmine'
 redmine::user_home: '/home/redmine'
-redmine::install_dir: "%{hiera('redmine::user_home')}/redmine"
+redmine::install_dir: "%{hiera('redmine::user_home')}"
 redmine::install_deps: true
 redmine::email_delivery: 'sendmail'
 redmine::smtp_domain: 'example.net'
