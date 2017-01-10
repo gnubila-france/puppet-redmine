@@ -246,26 +246,10 @@ class redmine (
   }
 
   file { 'redmine-login-dialog':
-    ensure => present,
-    path   => $redmine::login_page_file,
-    notify  => File['redmine-pki-partial'],
-  }->
-  file_line { 'Move username/login dialog to bottom of page':
-    path  => $redmine::login_page_file,
-    line  => '<%= call_hook :view_account_login_bottom %>',
-    match => ".*_login_top.*",
+    ensure  => present,
+    source  => 'puppet:///modules/redmine/login.html.erb',
+    notify  => File['redmine.conf'],
   } 
-
-#  file { 'redmine-pki-partial':
-#    ensure => present,
-#    path   => $redmine::login_page_file,
-#    notify  => File['redmine.conf'],
-#  }->
-#  file_line { 'Make call to display pki partial at the top of the page':
-#    path  => $redmine::login_page_file,
-#    line  => '<%= call_hook :view_account_login_top %>',
-#    match => ".*_login_bottom.*$",
-#  } 
 
   file { 'redmine.conf':
     ensure  => $redmine::manage_file,
