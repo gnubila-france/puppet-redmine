@@ -242,11 +242,12 @@ class redmine (
     owner   => $redmine::user,
     group   => $redmine::group,
     require => Puppi::Netinstall['redmine'],
-    notify  => File['redmine-login-dialog'],
+    notify  => File['update-login-page'],
   }
 
-  file { 'redmine-login-dialog':
+  file { 'update-login-page':
     ensure  => present,
+    path => $redmine::login_page_file,
     source  => 'puppet:///modules/redmine/login.html.erb',
     notify  => File['redmine.conf'],
   } 
