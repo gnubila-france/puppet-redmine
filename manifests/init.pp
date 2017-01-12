@@ -249,8 +249,19 @@ class redmine (
     ensure  => present,
     path => $redmine::login_page_file,
     source  => 'puppet:///modules/redmine/login.html.erb',
-    notify  => File['redmine.conf'],
+    notify  => File['fix_gemfile_issue'],
   } 
+
+  file { 'fix_gemfile_issue':
+    path => "${redmine::install_dir}/Gemfile",
+    ensure => present,
+    notify  => File['redmine.conf'],
+  }->
+  file_line {'Prevent upgrade of nokogiri gem':
+    path  => "${redmine::install_dir}/Gemfile",
+    line  => "gem \"nokogiri\", \"~> 1.6.7.2\"",
+    match => "gem \"nokogiri\", \"\>\= 1\.6\.7\.2\"",
+  }
 
   file { 'redmine.conf':
     ensure  => $redmine::manage_file,
