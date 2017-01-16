@@ -242,7 +242,7 @@ class redmine (
     owner   => $redmine::user,
     group   => $redmine::group,
     require => Puppi::Netinstall['redmine'],
-    notify  => File['update-login-page'],
+    notify  => Exec['update-login-page'],
   }
 
   exec { 'update-login-page':
