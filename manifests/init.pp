@@ -341,6 +341,7 @@ class redmine (
 
     file { "${redmine::install_dir}/.bundle/config":
       ensure  => file,
+      replace => 'no',
       owner   => $redmine::user,
       group   => $redmine::group,
       mode    => '0640',
