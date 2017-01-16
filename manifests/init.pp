@@ -245,22 +245,16 @@ class redmine (
     notify  => File['update-login-page'],
   }
 
-  file { 'update-login-page':
-    ensure  => present,
-    path => $redmine::login_page_file,
-    source  => 'puppet:///modules/redmine/login.html.erb',
-    notify  => File['fix_gemfile_issue'],
-  } 
+  exec { 'update-login-page':
+     command => "/bin/cp /etc/puppetlabs/code/environments/production/modules/redmine/files/login.html.erb ${redmine::user_home}/redmine/app/views/account/login.html.erb",
+     unless  => "/bin/grep -E 'Custom login page' ${redmine::user_home}/redmine/app/views/account/login.html.erb",
+     notify  => Exec['fix-gemfile-issue'],
+  }
 
-  file { 'fix_gemfile_issue':
-    path => "${redmine::install_dir}/Gemfile",
-    ensure => present,
-    notify  => File['redmine.conf'],
-  }->
-  file_line {'Prevent upgrade of nokogiri gem':
-    path  => "${redmine::install_dir}/Gemfile",
-    line  => "gem \"nokogiri\", \"~> 1.6.7.2\"",
-    match => "gem \"nokogiri\", \"\>\= 1\.6\.7\.2\"",
+  exec { 'fix-gemfile-issue':
+     command => "/bin/sed -i -- 's/gem \"nokogiri\", \">= 1.6.7.2\"/gem \"nokogiri\", \"~> 1.6.7.2\"/g' ${redmine::user_home}/redmine/Gemfile",
+     unless  => "/bin/grep -E 'nokogiri.*~> 1.6.7.2' ${redmine::user_home}/redmine/Gemfile",
+     notify  => File['redmine.conf'],
   }
 
   file { 'redmine.conf':
