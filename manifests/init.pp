@@ -360,6 +360,7 @@ class redmine (
     environment => $gemenv,
     require     => Class['devops::ruby'],
     notify      => Exec['Generate secret token'],
+    unless  => "bundle check",
   }
 
   exec { 'Generate secret token':
@@ -413,6 +414,7 @@ class redmine (
       path    => $path,
       user    => $redmine::user,
       require => Puppi::Netinstall['redmine_custom'],
+      unless  => "/usr/bin/rsync -nri ${redmine::install_dir}/custom/ ${redmine::install_dir}/ | /usr/bin/wc -l",
     }
 
   }
