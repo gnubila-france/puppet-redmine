@@ -421,6 +421,11 @@ class redmine (
       unless  => "/usr/bin/rsync -nri ${redmine::install_dir}/custom/ ${redmine::install_dir}/ | /usr/bin/wc -l",
     }
 
+    file { "${redmine::install_dir}/config":
+      ensure  => directory,
+      seluser => 'system_u',
+    }
+
   }
 
 }
