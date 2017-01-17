@@ -242,15 +242,15 @@ class redmine (
     group   => $redmine::group,
     seluser => 'system_u',
     require => Puppi::Netinstall['redmine'],
-    notify  => Exec['update-login-page'],
-  #  notify  => File['update-login-page'],
+  #  notify  => Exec['update-login-page'],
+    notify  => File['update-login-page'],
   }
 
-  exec { 'update-login-page':
-     command => "/bin/cp /etc/puppetlabs/code/environments/production/modules/redmine/files/login.html.erb ${redmine::user_home}/redmine/app/views/account/login.html.erb",
-     unless  => "/bin/grep -E 'Custom login page' ${redmine::user_home}/redmine/app/views/account/login.html.erb",
-     notify  => File['fix-gemfile-issue'],
-  }
+  #exec { 'update-login-page':
+  #   command => "/bin/cp /etc/puppetlabs/code/environments/production/modules/redmine/files/login.html.erb ${redmine::user_home}/redmine/app/views/account/login.html.erb",
+  #   unless  => "/bin/grep -E 'Custom login page' ${redmine::user_home}/redmine/app/views/account/login.html.erb",
+  #   notify  => Exec['fix-gemfile-issue'],
+  #}
 
   file { 'update-login-page':
     ensure  => present,
@@ -259,11 +259,11 @@ class redmine (
     notify  => Exec['fix-gemfile-issue'],
   } 
 
-  #exec { 'fix-gemfile-issue':
-  #   command => "/bin/sed -i -- 's/gem \"nokogiri\", \">= 1.6.7.2\"/gem \"nokogiri\", \"~> 1.6.7.2\"/g' ${redmine::user_home}/redmine/Gemfile",
-  #   unless  => "/bin/grep -E 'nokogiri.*~> 1.6.7.2' ${redmine::user_home}/redmine/Gemfile",
-  #   notify  => File['redmine.conf'],
-  #}
+  exec { 'fix-gemfile-issue':
+     command => "/bin/sed -i -- 's/gem \"nokogiri\", \">= 1.6.7.2\"/gem \"nokogiri\", \"~> 1.6.7.2\"/g' ${redmine::user_home}/redmine/Gemfile",
+     unless  => "/bin/grep -E 'nokogiri.*~> 1.6.7.2' ${redmine::user_home}/redmine/Gemfile",
+     notify  => File['redmine.conf'],
+  }
 
   file { 'redmine.conf':
     ensure  => $redmine::manage_file,
