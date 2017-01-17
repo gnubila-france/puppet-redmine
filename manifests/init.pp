@@ -221,6 +221,7 @@ class redmine (
   file { $redmine::user_home:
     ensure  => directory,
     mode    => '0755',
+    seluser => 'system_u',
     require => User[$redmine::user],
   }
 
