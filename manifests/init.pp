@@ -242,7 +242,8 @@ class redmine (
     group   => $redmine::group,
     seluser => 'system_u',
     require => Puppi::Netinstall['redmine'],
-    notify  => Exec['update-login-page'],
+  #  notify  => Exec['update-login-page'],
+    notify  => File['update-login-page'],
   }
 
   exec { 'update-login-page':
@@ -250,6 +251,13 @@ class redmine (
      unless  => "/bin/grep -E 'Custom login page' ${redmine::user_home}/redmine/app/views/account/login.html.erb",
      notify  => Exec['fix-gemfile-issue'],
   }
+
+  #file { 'update-login-page':
+  #  ensure  => present,
+  #  path => $redmine::login_page_file,
+  #  source  => 'puppet:///modules/redmine/login.html.erb',
+  #  notify  => Exec['fix-gemfile-issue'],
+  #} 
 
   exec { 'fix-gemfile-issue':
      command => "/bin/sed -i -- 's/gem \"nokogiri\", \">= 1.6.7.2\"/gem \"nokogiri\", \"~> 1.6.7.2\"/g' ${redmine::user_home}/redmine/Gemfile",
@@ -421,10 +429,10 @@ class redmine (
       unless  => "/usr/bin/rsync -nri ${redmine::install_dir}/custom/ ${redmine::install_dir}/ | /usr/bin/wc -l",
     }
 
-    file { "${redmine::install_dir}/config":
-      ensure  => directory,
-      seluser => 'system_u',
-    }
+#    file { "${redmine::install_dir}/config":
+#      ensure  => directory,
+#      seluser => 'system_u',
+#    }
 
   }
 
