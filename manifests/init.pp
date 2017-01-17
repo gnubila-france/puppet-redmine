@@ -218,13 +218,11 @@ class redmine (
     shell      => '/bin/bash',
   }
 
-#  file { $redmine::user_home:
-#    ensure  => directory,
-#    owner   => $redmine::user,
-#    group   => $redmine::group,
-#    mode    => '0755',
-#    require => User[$redmine::user],
-#  }
+  file { $redmine::user_home:
+    ensure  => directory,
+    mode    => '0755',
+    require => User[$redmine::user],
+  }
 
   $src_url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
   puppi::netinstall { 'redmine':
@@ -241,6 +239,7 @@ class redmine (
     path    => "${redmine::user_home}/redmine",
     owner   => $redmine::user,
     group   => $redmine::group,
+    seluser => 'system_u',
     require => Puppi::Netinstall['redmine'],
     notify  => Exec['update-login-page'],
   }
@@ -263,6 +262,7 @@ class redmine (
     mode    => $redmine::config_file_mode,
     owner   => $redmine::config_file_owner,
     group   => $redmine::config_file_group,
+    seluser => 'system_u',
     require => File['redmine_link'],
     content => $redmine::manage_file_content,
     replace => $redmine::manage_file_replace,
@@ -335,6 +335,7 @@ class redmine (
       ensure  => directory,
       owner   => $redmine::user,
       group   => $redmine::group,
+      seluser => 'system_u',
       mode    => '0750',
       require => File[$redmine::install_dir],
     }
@@ -345,6 +346,7 @@ class redmine (
       owner   => $redmine::user,
       group   => $redmine::group,
       mode    => '0640',
+      seluser => 'system_u',
       require => File["${redmine::install_dir}/.bundle"],
       content => template($redmine::bundle_config_template),
       before  => Exec['Install gems using bundler'],
