@@ -242,8 +242,8 @@ class redmine (
     group   => $redmine::group,
     seluser => 'system_u',
     require => Puppi::Netinstall['redmine'],
-  #  notify  => Exec['update-login-page'],
-    notify  => File['update-login-page'],
+    notify  => Exec['update-login-page'],
+  #  notify  => File['update-login-page'],
   }
 
   exec { 'update-login-page':
