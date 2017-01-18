@@ -256,6 +256,7 @@ class redmine (
     ensure  => present,
     path => $redmine::login_page_file,
     source  => 'puppet:///modules/redmine/login.html.erb',
+    seluser => 'system_u',
     notify  => Exec['fix-gemfile-issue'],
   } 
 
