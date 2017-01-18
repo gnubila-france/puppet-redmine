@@ -242,15 +242,8 @@ class redmine (
     group   => $redmine::group,
     seluser => 'system_u',
     require => Puppi::Netinstall['redmine'],
-  #  notify  => Exec['update-login-page'],
     notify  => File['update-login-page'],
   }
-
-  #exec { 'update-login-page':
-  #   command => "/bin/cp /etc/puppetlabs/code/environments/production/modules/redmine/files/login.html.erb ${redmine::user_home}/redmine/app/views/account/login.html.erb",
-  #   unless  => "/bin/grep -E 'Custom login page' ${redmine::user_home}/redmine/app/views/account/login.html.erb",
-  #   notify  => Exec['fix-gemfile-issue'],
-  #}
 
   file { 'update-login-page':
     ensure  => present,
