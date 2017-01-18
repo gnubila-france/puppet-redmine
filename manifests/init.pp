@@ -68,6 +68,12 @@
 # Set and override them only if you know what you're doing.
 # Note also that you can't override/set them via top scope variables.
 #
+# [*account_view_dir*]
+#   Application views account directory 
+#
+# [*login_page_file*]
+#   File used to generate the Redmine login page 
+#
 # [*config_dir*]
 #   Main configuration directory. Used by puppi
 #
@@ -140,6 +146,8 @@ class redmine (
   Boolean $absent,
   Boolean $audit_only,
   Boolean $noops,
+  String $account_view_dir,
+  String $login_page_file,
   String $config_dir,
   String $config_file,
   String $config_file_mode,
@@ -212,9 +220,8 @@ class redmine (
 
   file { $redmine::user_home:
     ensure  => directory,
-    owner   => $redmine::user,
-    group   => $redmine::group,
     mode    => '0755',
+    seluser => 'system_u',
     require => User[$redmine::user],
   }
 
@@ -233,8 +240,23 @@ class redmine (
     path    => "${redmine::user_home}/redmine",
     owner   => $redmine::user,
     group   => $redmine::group,
+    seluser => 'system_u',
     require => Puppi::Netinstall['redmine'],
-    notify  => File['redmine.conf'],
+    notify  => File['update-login-page'],
+  }
+
+  file { 'update-login-page':
+    ensure  => present,
+    path => $redmine::login_page_file,
+    source  => 'puppet:///modules/redmine/login.html.erb',
+    seluser => 'system_u',
+    notify  => Exec['fix-gemfile-issue'],
+  } 
+
+  exec { 'fix-gemfile-issue':
+     command => "/bin/sed -i -- 's/gem \"nokogiri\", \">= 1.6.7.2\"/gem \"nokogiri\", \"~> 1.6.7.2\"/g' ${redmine::user_home}/redmine/Gemfile",
+     unless  => "/bin/grep -E 'nokogiri.*~> 1.6.7.2' ${redmine::user_home}/redmine/Gemfile",
+     notify  => File['redmine.conf'],
   }
 
   file { 'redmine.conf':
@@ -243,6 +265,7 @@ class redmine (
     mode    => $redmine::config_file_mode,
     owner   => $redmine::config_file_owner,
     group   => $redmine::config_file_group,
+    seluser => 'system_u',
     require => File['redmine_link'],
     content => $redmine::manage_file_content,
     replace => $redmine::manage_file_replace,
@@ -257,6 +280,7 @@ class redmine (
     mode    => $redmine::config_file_mode,
     owner   => $redmine::config_file_owner,
     group   => $redmine::config_file_group,
+    seluser => 'system_u',
     require => File['redmine_link'],
     content => $redmine::manage_db_file_content,
     replace => $redmine::manage_file_replace,
@@ -315,15 +339,18 @@ class redmine (
       ensure  => directory,
       owner   => $redmine::user,
       group   => $redmine::group,
+      seluser => 'system_u',
       mode    => '0750',
       require => File[$redmine::install_dir],
     }
 
     file { "${redmine::install_dir}/.bundle/config":
       ensure  => file,
+      replace => 'no',
       owner   => $redmine::user,
       group   => $redmine::group,
       mode    => '0640',
+      seluser => 'system_u',
       require => File["${redmine::install_dir}/.bundle"],
       content => template($redmine::bundle_config_template),
       before  => Exec['Install gems using bundler'],
@@ -339,6 +366,7 @@ class redmine (
     environment => $gemenv,
     require     => Class['devops::ruby'],
     notify      => Exec['Generate secret token'],
+    unless  => "bundle check",
   }
 
   exec { 'Generate secret token':
@@ -392,6 +420,12 @@ class redmine (
       path    => $path,
       user    => $redmine::user,
       require => Puppi::Netinstall['redmine_custom'],
+      unless  => "/usr/bin/rsync -nri ${redmine::install_dir}/custom/ ${redmine::install_dir}/ | /usr/bin/wc -l",
+    }
+
+    file { "${redmine::install_dir}/public":
+      ensure  => directory,
+      seluser => 'system_u',
     }
 
   }

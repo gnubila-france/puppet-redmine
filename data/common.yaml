@@ -48,6 +48,8 @@ redmine::ssl_cert_key_content: ''
 redmine::install_url_base: 'http://www.redmine.org/releases'
 redmine::rubygems_mirror: ''
 redmine::config_dir: "%{hiera('redmine::install_dir')}/config/"
+redmine::account_view_dir: "%{hiera('redmine::install_dir')}/app/views/account"
+redmine::login_page_file: "%{hiera('redmine::account_view_dir')}/login.html.erb"
 redmine::config_file: "%{hiera('redmine::config_dir')}/configuration.yml"
 redmine::config_file_mode: '0644'
 redmine::config_file_owner: "%{hiera('redmine::user')}"
