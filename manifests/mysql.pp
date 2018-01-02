@@ -16,7 +16,10 @@
 #
 # Copyright 2015 gnúbila
 #
-class redmine::mysql {
+class redmine::mysql () {
+
+  include ::redmine
+
   if $::redmine::db_host == 'localhost' {
     include ::mysql::server
     mysql::db { $::redmine::db_name:

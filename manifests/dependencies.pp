@@ -20,23 +20,42 @@
 #
 # Copyright 2015 gnúbila
 #
-class redmine::dependencies {
-  package { 'imagemagick':
-    ensure => 'present',
+
+class redmine::dependencies (
+  String $pname_passenger,
+  String $pname_mod_passenger,
+  String $pname_imagemagick,
+  String $pname_imagemagick_dev,
+  String $pname_mysql_dev,
+  String $pname_pgsql_dev,
+  String $pname_openssl_dev,
+  String $pname_apache_dev,
+  String $pname_apr_dev,
+  String $pname_apr_util_dev,
+  ) {
+
+  include ::redmine
+
+  if !defined(Package['bundler']) {
+    package { 'bundler':
+      ensure => installed,
+    }
   }
-  package { 'libmagickwand-dev':
-    ensure => 'present',
-  }
-  case $redmine::db_type {
-    /^mysql/: {
-      package { 'libmysqlclient-dev':
-        ensure => 'present',
+
+  ['ruby-devel','gcc'].each |String $pkg| {
+    if !defined(Package[$pkg]) {
+      package { $pkg:
+        ensure => present,
       }
     }
+  }
+
+  case $redmine::db_type {
+    /^mysql/: {
+      package { $redmine::dependencies::pname_mysql_dev: ensure => 'present' }
+    }
     'pgsql': {
-      package { 'libpq-dev':
-        ensure => 'present',
-      }
+      package { $redmine::dependencies::pname_pgsql_dev: ensure => 'present' }
     }
     default: {
       fail('Unsupported db_type')
@@ -44,19 +63,20 @@ class redmine::dependencies {
   }
 
   if $redmine::webserver_type == 'apache' {
-    package { 'libcurl4-openssl-dev':
-      ensure => 'present',
-    }
-    package { 'apache2-threaded-dev':
-      ensure => 'present',
-    }
-    package { 'libapr1-dev':
-      ensure => 'present',
-    }
-    package { 'libaprutil1-dev':
-      ensure => 'present',
-    }
+    package { $redmine::dependencies::pname_openssl_dev: ensure => 'present' }
+    package { $redmine::dependencies::pname_apache_dev: ensure => 'present' }
+    package { $redmine::dependencies::pname_apr_dev: ensure => 'present' }
+    package { $redmine::dependencies::pname_apr_util_dev: ensure => 'present' }
   }
+
+  include "redmine::${redmine::webserver_type}"
+
+  package { $redmine::dependencies::pname_passenger: ensure => 'present' }
+  package { $redmine::dependencies::pname_mod_passenger: ensure => 'present' }
+
+  package { $redmine::dependencies::pname_imagemagick: ensure => 'present' }
+  package { $redmine::dependencies::pname_imagemagick_dev: ensure => 'present' }
+
 }
 
 # vim: set et sw=2:

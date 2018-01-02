@@ -21,61 +21,80 @@
 # Copyright 2015 gnúbila
 #
 define redmine::plugin (
-  $user = $redmine::owner,
-  $group = $user,
-  $redmine_home = "${redmine::install_dir}/redmine",
-  $repo_url = undef,
-  $revision = 'master',
-  $provider = 'git',
+  String $url,
+  String $plugin_repo = $redmine::plugin_repo,
+  String $user = $redmine::user,
+  String $group = $redmine::group,
 ) {
   include ::redmine
 
-  if $repo_url == undef {
-    fail('Please provide rep_url.')
-  }
-  vcsrepo { "${redmine_home}/plugins/${title}":
-    ensure   => 'present',
-    provider => $provider,
-    source   => $repo_url,
-    revision => $revision,
-    user     => $user,
-    notify   => Exec["Update gems environment using bundler for plugin ${title}"],
-    require  => File['redmine_link'],
-  }
-
   $path = [
-    "${redmine::install_dir}/.rbenv/shims",
-    "${redmine::install_dir}/.rbenv/bin",
-    '/bin', '/usr/bin', '/usr/sbin'
+    "${redmine::user_home}/bin",
+    '/bin', '/usr/bin', '/usr/sbin', '/usr/local/bin'
   ]
-  exec { "Update gems environment using bundler for plugin ${title}":
-    command     => 'bundle update',
-    user        => $user,
-    cwd         => "${redmine_home}/plugins/${title}",
-    path        => $path,
-    refreshonly => true,
-    notify      => Exec["Install gems using bundler for plugin ${title}"],
-    require     => Exec['Install gems using bundler'],
-  }
-  exec { "Install gems using bundler for plugin ${title}":
-    command     => 'bundle install --without development test',
-    user        => $user,
-    cwd         => "${redmine_home}/plugins/${title}",
-    path        => $path,
-    refreshonly => true,
-    notify      => Exec["Run database migration for plugin ${title}"],
-    require     => Exec['Install gems using bundler'],
+
+  $gemenv = hiera('redmine::gemenv')
+  $appdir = "${redmine::user_home}/redmine-${redmine::version}"
+
+  puppi::netinstall { $title:
+    url             => "$url",
+    destination_dir => "${appdir}/plugins/",
+    extracted_dir   => $title,
+    owner           => $user,
+    group           => $group,
+    notify          => Exec["Install gems using bundler for plugin ${title}"],
+    require         => File['redmine-database.conf'],
   }
 
-  exec { "Run database migration for plugin ${title}":
+  exec { "Install gems using bundler for plugin ${title}":
+    command     => 'bundle install',
+    user        => $user,
+    cwd         => $redmine::install_dir,
+    path        => $path,
+    environment => $gemenv,
+    refreshonly => true,
+    require     => Exec['Install gems using bundler'],
+    notify      => Exec["update db schema for plugin ${title}"],
+  }
+
+  exec { "update db schema for plugin ${title}":
+    command     => 'bundle exec rake db:migrate',
+    user        => $user,
+    cwd         => "${redmine::install_dir}/plugins",
+    path        => $path,
+    environment => $gemenv,
+    refreshonly => true,
+    require     => [ Exec["Install gems using bundler for plugin ${title}"], Class["redmine::${redmine::db_type}"] ],
+    notify      => Exec["Run plugin migration for plugin ${title}"],
+  }
+
+  exec { "Run plugin migration for plugin ${title}":
     command     => 'bundle exec rake redmine:plugins:migrate',
     user        => $user,
-    cwd         => $redmine_home,
+    cwd         => $redmine::install_dir,
     path        => $path,
-    environment => [ 'RAILS_ENV=production' ],
+    environment => $gemenv,
     refreshonly => true,
-    require     => Exec['Run database migration'],
+    require     => Exec["update db schema for plugin ${title}"],
   }
+
+  file { "${appdir}/plugins/${title}":
+    require => Exec["Run plugin migration for plugin ${title}"],
+    recurse => true,
+    owner   => $user,
+    group   => $user,
+    mode    => '0644',
+  }
+
+  file { "${appdir}/public/plugin_assets/${title}":
+    require => Exec["Run plugin migration for plugin ${title}"],
+    recurse => true,
+    owner   => $user,
+    group   => $user,
+    mode    => '0644',
+  }
+
+
 }
 
 # vim: set et sw=2:

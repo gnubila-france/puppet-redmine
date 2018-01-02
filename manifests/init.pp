@@ -68,6 +68,12 @@
 # Set and override them only if you know what you're doing.
 # Note also that you can't override/set them via top scope variables.
 #
+# [*account_view_dir*]
+#   Application views account directory 
+#
+# [*login_page_file*]
+#   File used to generate the Redmine login page 
+#
 # [*config_dir*]
 #   Main configuration directory. Used by puppi
 #
@@ -84,58 +90,77 @@
 #
 #
 class redmine (
-  $db_type             = params_lookup( 'db_type' ),
-  $db_adapter          = params_lookup( 'db_adapter' ),
-  $db_name             = params_lookup( 'db_name' ),
-  $db_user             = params_lookup( 'db_user' ),
-  $db_password         = params_lookup( 'db_password' ),
-  $db_host             = params_lookup( 'db_host' ),
-  $db_charset          = params_lookup( 'db_charset' ),
-  $db_collate          = params_lookup( 'db_collate' ),
-  $webserver_type      = params_lookup( 'webserver_type' ),
-  $vhost_template      = params_lookup( 'vhost_template' ),
-  $server_name         = params_lookup( 'server_name' ),
-  $serveraliases       = params_lookup( 'serveraliases' ),
-  $template_passenger  = params_lookup( 'template_passenger' ),
-  $ssl                 = params_lookup( 'ssl' ),
-  $ssl_protocol        = params_lookup( 'ssl_protocol' ),
-  $ssl_cipher_suite    = params_lookup( 'ssl_cipher_suite' ),
-  $ssl_cert            = params_lookup( 'ssl_cert' ),
-  $ssl_cert_src        = params_lookup( 'ssl_cert_src' ),
-  $ssl_cert_key        = params_lookup( 'ssl_cert_key' ),
-  $ssl_cert_key_src    = params_lookup( 'ssl_cert_key_src' ),
-  $ssl_ca_cert         = params_lookup( 'ssl_ca_cert' ),
-  $ssl_ca_cert_src     = params_lookup( 'ssl_ca_cert_src' ),
-  $ssl_ca_cert_chain   = params_lookup( 'ssl_ca_cert_chain' ),
-  $ssl_ca_cert_chain_src = params_lookup( 'ssl_ca_cert_chain_src' ),
-  $install_dir         = params_lookup( 'install_dir' ),
-  $install_deps        = params_lookup( 'install_deps' ),
-  $email_delivery      = params_lookup( 'email_delivery' ),
-  $smtp_domain         = params_lookup( 'smtp_domain' ),
-  $smtp_server         = params_lookup( 'smtp_server' ),
-  $plugins             = params_lookup( 'plugins' ),
-  $version             = params_lookup( 'version' ),
-  $ruby_version        = params_lookup( 'ruby_version' ),
-  $passenger_version   = params_lookup( 'passenger_version' ),
-  $owner               = params_lookup( 'owner' ),
-  $group               = params_lookup( 'group' ),
-  $my_class            = params_lookup( 'my_class' ),
-  $source              = params_lookup( 'source' ),
-  $source_dir          = params_lookup( 'source_dir' ),
-  $source_dir_purge    = params_lookup( 'source_dir_purge' ),
-  $template            = params_lookup( 'template' ),
-  $db_template         = params_lookup( 'db_template' ),
-  $options             = params_lookup( 'options' ),
-  $absent              = params_lookup( 'absent' ),
-  $audit_only          = params_lookup( 'audit_only' , 'global' ),
-  $noops               = params_lookup( 'noops' ),
-  $config_dir          = params_lookup( 'config_dir' ),
-  $config_file         = params_lookup( 'config_file' )
-  ) inherits redmine::params {
+  String $db_type,
+  String $db_adapter,
+  String $db_name,
+  String $db_user,
+  String $db_password,
+  String $db_host,
+  String $db_charset,
+  String $db_collate,
+  String $webserver_type,
+  String $vhost_template,
+  String $server_name,
+  String $serveraliases,
+  Boolean $ssl,
+  String $ssl_protocol,
+  String $ssl_cipher_suite,
+  String $ssl_cert,
+  String $ssl_cert_src,
+  String $ssl_cert_content,
+  String $ssl_cert_key,
+  String $ssl_cert_key_src,
+  String $ssl_cert_key_content,
+  String $ssl_ca_cert,
+  String $ssl_ca_cert_src,
+  String $ssl_ca_cert_content,
+  String $ssl_ca_cert_chain,
+  String $ssl_ca_cert_chain_src,
+  String $ssl_ca_cert_chain_content,
+  String $install_dir,
+  Boolean $install_deps,
+  String $email_delivery,
+  String $smtp_server,
+  String $smtp_domain,
+  Integer $smtp_port,
+  String $smtp_authentication,
+  String $smtp_user_name,
+  String $smtp_password,
+  String $plugin_repo,
+  #String $plugin_repo_proto,
+  #String $plugin_repo_creds,
+  String $version,
+  String $ruby_version,
+  String $passenger_version,
+  String $user,
+  String $group,
+  String $user_home,
+  String $my_class,
+  String $source,
+  String $source_dir,
+  Boolean $source_dir_purge,
+  String $template,
+  String $db_template,
+  String $bundle_config_template,
+  String $options,
+  Boolean $absent,
+  Boolean $audit_only,
+  Boolean $noops,
+  String $account_view_dir,
+  String $login_page_file,
+  String $config_dir,
+  String $config_file,
+  String $config_file_mode,
+  String $config_file_owner,
+  String $config_file_group,
+  String $db_config_file,
+  String $install_url_base,
+  String $attachments_storage_path,
+  String $custom_files_url,
+  Hash $plugins = '',
+  String $rubygems_mirror = undef,
+  ) {
 
-  $config_file_mode=$redmine::params::config_file_mode
-  $config_file_owner=$redmine::params::config_file_owner
-  $config_file_group=$redmine::params::config_file_group
 
   $bool_source_dir_purge=any2bool($source_dir_purge)
   $bool_absent=any2bool($absent)
@@ -173,27 +198,65 @@ class redmine (
     default   => template($redmine::db_template),
   }
 
+  $gemenv = hiera('redmine::gemenv')
+
+  $path = [
+    "${redmine::user_home}/bin",
+    '/bin', '/usr/bin', '/sbin', '/usr/sbin', '/usr/local/bin',
+  ]
+
+  if $redmine::install_deps {
+    include redmine::dependencies
+    Class['redmine::dependencies'] ~> Class['redmine']
+  }
+
   ### Managed resources
-  user { $redmine::owner:
+  user { $redmine::user:
     ensure     => 'present',
-    home       => $redmine::install_dir,
+    home       => $redmine::user_home,
     managehome => true,
     shell      => '/bin/bash',
+  }
+
+  file { $redmine::user_home:
+    ensure  => directory,
+    mode    => '0755',
+    seluser => 'system_u',
+    require => User[$redmine::user],
   }
 
   $src_url = "${redmine::install_url_base}/redmine-${redmine::version}.tar.gz"
   puppi::netinstall { 'redmine':
     url             => $src_url,
-    destination_dir => $redmine::install_dir,
-    owner           => $redmine::owner,
+    destination_dir => $redmine::user_home,
+    owner           => $redmine::user,
     group           => $redmine::group,
-    require         => User[$redmine::owner],
+    require         => User[$redmine::user],
   }
+
   file { 'redmine_link':
-    ensure  => 'link',
-    target  => "${redmine::install_dir}/redmine-${redmine::version}",
-    path    => "${redmine::install_dir}/redmine",
+    ensure  => link,
+    target  => "${redmine::user_home}/redmine-${redmine::version}",
+    path    => "${redmine::user_home}/redmine",
+    owner   => $redmine::user,
+    group   => $redmine::group,
+    seluser => 'system_u',
     require => Puppi::Netinstall['redmine'],
+    notify  => File['update-login-page'],
+  }
+
+  file { 'update-login-page':
+    ensure  => present,
+    path => $redmine::login_page_file,
+    source  => 'puppet:///modules/redmine/login.html.erb',
+    seluser => 'system_u',
+    notify  => Exec['fix-gemfile-issue'],
+  } 
+
+  exec { 'fix-gemfile-issue':
+     command => "/bin/sed -i -- 's/gem \"nokogiri\", \">= 1.6.7.2\"/gem \"nokogiri\", \"~> 1.6.7.2\"/g' ${redmine::user_home}/redmine/Gemfile",
+     unless  => "/bin/grep -E 'nokogiri.*~> 1.6.7.2' ${redmine::user_home}/redmine/Gemfile",
+     notify  => File['redmine.conf'],
   }
 
   file { 'redmine.conf':
@@ -202,11 +265,13 @@ class redmine (
     mode    => $redmine::config_file_mode,
     owner   => $redmine::config_file_owner,
     group   => $redmine::config_file_group,
+    seluser => 'system_u',
     require => File['redmine_link'],
     content => $redmine::manage_file_content,
     replace => $redmine::manage_file_replace,
     audit   => $redmine::manage_audit,
     noop    => $redmine::bool_noops,
+    notify  => File['redmine-database.conf'],
   }
 
   file { 'redmine-database.conf':
@@ -215,11 +280,13 @@ class redmine (
     mode    => $redmine::config_file_mode,
     owner   => $redmine::config_file_owner,
     group   => $redmine::config_file_group,
+    seluser => 'system_u',
     require => File['redmine_link'],
     content => $redmine::manage_db_file_content,
     replace => $redmine::manage_file_replace,
     audit   => $redmine::manage_audit,
     noop    => $redmine::bool_noops,
+    notify  => Class["redmine::${redmine::db_type}"],
   }
 
   # The whole redmine configuration directory can be recursively overriden
@@ -238,94 +305,131 @@ class redmine (
     }
   }
 
+  if $redmine::attachments_storage_path and $redmine::attachments_storage_path != '' {
+    exec { 'parents_of_attachments_storage_path':
+      command => "mkdir -p ${redmine::attachments_storage_path} 2> /dev/null",
+      path    => $path,
+      creates => $redmine::attachments_storage_path,
+      require => User[$redmine::user],
+      notify  => File[$redmine::attachments_storage_path],
+    }
+
+    file { $redmine::attachments_storage_path:
+      ensure  => directory,
+      path    => $redmine::attachments_storage_path,
+      owner   => $redmine::user,
+      group   => $redmine::group,
+      require => Exec['parents_of_attachments_storage_path'],
+      recurse => true,
+    }
+  }
+
   ### Include custom class if $my_class is set
   if $redmine::my_class and $redmine::my_class != '' {
     include $redmine::my_class
   }
 
-  if $redmine::install_deps {
-    include redmine::dependencies
-  }
-
-  # Setup database
+  # set up database
   include "redmine::${redmine::db_type}"
 
-  rbenv::install { $redmine::owner:
-    home    => $redmine::install_dir,
-    require => User[$redmine::owner],
+  # manage rubygems mirror in .bundle/config
+  if $redmine::rubygems_mirror != '' {
+
+    file { "${redmine::install_dir}/.bundle":
+      ensure  => directory,
+      owner   => $redmine::user,
+      group   => $redmine::group,
+      seluser => 'system_u',
+      mode    => '0750',
+      require => File[$redmine::install_dir],
+    }
+
+    file { "${redmine::install_dir}/.bundle/config":
+      ensure  => file,
+      replace => 'no',
+      owner   => $redmine::user,
+      group   => $redmine::group,
+      mode    => '0640',
+      seluser => 'system_u',
+      require => File["${redmine::install_dir}/.bundle"],
+      content => template($redmine::bundle_config_template),
+      before  => Exec['Install gems using bundler'],
+    }
+
   }
 
-  rbenv::compile { "${redmine::owner}/${redmine::ruby_version}":
-    user    => $redmine::owner,
-    home    => $redmine::install_dir,
-    ruby    => $redmine::ruby_version,
-    global  => true,
-    require => Rbenv::Install[$redmine::owner],
-    notify  => Exec['Update gems environment bundler'],
-  }
-
-  $path = [
-    "${redmine::install_dir}/.rbenv/shims",
-    "${redmine::install_dir}/.rbenv/bin",
-    '/bin', '/usr/bin', '/usr/sbin'
-  ]
-  $redmine_home = "${redmine::install_dir}/redmine"
-  exec { 'Update gems environment bundler':
-    command     => 'bundle update',
-    user        => $redmine::owner,
-    cwd         => $redmine_home,
-    path        => $path,
-    refreshonly => true,
-    notify      => Exec['Install gems using bundler'],
-    require     => File['redmine-database.conf'],
-  }
   exec { 'Install gems using bundler':
-    command     => 'bundle install --without development test',
-    user        => $redmine::owner,
-    cwd         => $redmine_home,
+    command     => "bundle install --path ${redmine::user_home}/.gem",
+    user        => $redmine::user,
+    cwd         => $redmine::install_dir,
     path        => $path,
-    refreshonly => true,
+    environment => $gemenv,
+    require     => Class['devops::ruby'],
     notify      => Exec['Generate secret token'],
+    unless  => "bundle check",
   }
 
   exec { 'Generate secret token':
     command     => 'bundle exec rake generate_secret_token',
-    user        => $redmine::owner,
-    cwd         => $redmine_home,
+    user        => $redmine::user,
+    cwd         => $redmine::install_dir,
     path        => $path,
+    environment => $gemenv,
     refreshonly => true,
+    require     => Exec['Install gems using bundler'],
     notify      => Exec['Run database migration'],
   }
 
   exec { 'Run database migration':
     command     => 'bundle exec rake db:migrate',
-    user        => $redmine::owner,
-    cwd         => $redmine_home,
+    user        => $redmine::user,
+    cwd         => $redmine::install_dir,
     path        => $path,
-    environment => [ 'RAILS_ENV=production' ],
+    environment => $gemenv,
     refreshonly => true,
+    require     => [ Exec['Install gems using bundler'], Class["redmine::${redmine::db_type}"] ],
   }
 
-  exec { 'Insert default data set':
-    command     => 'bundle exec rake redmine::load_default_data',
-    user        => $redmine::owner,
-    cwd         => $redmine_home,
-    path        => $path,
-    environment => [ 'RAILS_ENV=production', 'REDMINE_LANG=en' ],
-    refreshonly => true,
-  }
-
-  # Setup webserver
-  if $redmine::webserver_type != undef {
-    include "redmine::${redmine::webserver_type}"
-
-    Class["::redmine::${redmine::db_type}"]->
-    Class["::redmine::${redmine::webserver_type}"]
-  }
+#  TODO: create a boolean for this.  for now, don't load data
+#  exec { 'Insert default data set':
+#    command     => 'bundle exec rake redmine::load_default_data',
+#    user        => $redmine::user,
+#    cwd         => $redmine::install_dir,
+#    path        => $path,
+#    environment => [ 'RAILS_ENV=production', 'REDMINE_LANG=en' ],
+#    refreshonly => true,
+#  }
 
   if $redmine::plugins != undef and is_hash($redmine::plugins) {
     create_resources('::redmine::plugin', $redmine::plugins)
   }
+
+  if $redmine::custom_files_url != '' {
+    puppi::netinstall { 'redmine_custom':
+      url             => $redmine::custom_files_url,
+      destination_dir => "${redmine::install_dir}/custom",
+      extracted_dir   => '.',
+      owner           => $redmine::user,
+      group           => $redmine::group,
+      require         => File['redmine_link'],
+    }
+
+    # safety limitation in netinstall prevents going directly to desired target
+    exec { 'rsync custom to app':
+      command => "/usr/bin/rsync -r ${redmine::install_dir}/custom/ ${redmine::install_dir}/",
+      path    => $path,
+      user    => $redmine::user,
+      require => Puppi::Netinstall['redmine_custom'],
+      unless  => "/usr/bin/rsync -nri ${redmine::install_dir}/custom/ ${redmine::install_dir}/ | /usr/bin/wc -l",
+    }
+
+    file { "${redmine::install_dir}/public":
+      ensure  => directory,
+      seluser => 'system_u',
+    }
+
+  }
+
 }
 
 # vim: set et sw=2:

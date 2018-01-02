@@ -35,128 +35,197 @@
 # Copyright 2015 gnúbila
 #
 class redmine::apache (
-  $user = $redmine::owner,
-  $group = $user,
-  $redmine_home = "${redmine::install_dir}/redmine",
-  $template_passenger = params_lookup( 'template_passenger' ),
-) inherits redmine::params {
+    $yum_url = undef,
+) {
+
+  class  {'apache': default_vhost => false, }
+  $docroot = "${redmine::install_dir}/public/"
+
   include ::redmine
   include ::apache
+  include ::apache::mod::passenger
+
+  if $yum_url and !defined(Yumrepo['passenger']) {
+    yumrepo { 'passenger':
+      baseurl  => $yum_url,
+      descr    => 'passenger',
+      enabled  => '1',
+      gpgcheck => '0',
+      before   => Apache::Mod['passenger']
+    }
+  }
 
   if $::redmine::ssl {
+
     include ::apache::mod::ssl
 
-    file { $::redmine::ssl_cert:
-      ensure  => 'file',
-      owner   => $::apache::user,
-      group   => $::apache::group,
-      mode    => '0640',
-      source  => $::redmine::ssl_cert_src,
-      notify  => Class['::apache::service'],
-      require => [
-        File[$::redmine::ssl_cert_key],
-        File[$::redmine::ssl_ca_cert],
-      ]
+    # it seems that there should be a better way to choose between 'content' and 'source' attributes.
+    # any suggestions?
+    if  $::redmine::ssl_cert_content != 'undef'  {
+      file { $::redmine::ssl_cert:
+        ensure  => 'file',
+        owner   => $::apache::user,
+        group   => $::apache::group,
+        mode    => '0640',
+        notify  => Class['::apache::service'],
+        content => $::redmine::ssl_cert_content,
+        require => [
+          File[$::redmine::ssl_cert_key],
+          File[$::redmine::ssl_ca_cert],
+        ]
+      }
+    } else {
+      file { $::redmine::ssl_cert:
+        ensure  => 'file',
+        owner   => $::apache::user,
+        group   => $::apache::group,
+        mode    => '0640',
+        notify  => Class['::apache::service'],
+        source  => $::redmine::ssl_cert_src,
+        require => [
+          File[$::redmine::ssl_cert_key],
+          File[$::redmine::ssl_ca_cert],
+        ]
+      }
     }
-    file { $::redmine::ssl_cert_key:
-      ensure => 'file',
-      owner  => $::apache::user,
-      group  => $::apache::group,
-      mode   => '0400',
-      source => $::redmine::ssl_cert_key_src,
-      notify => Class['::apache::service'],
-    }
-    if ! defined(File[$::redmine::ssl_ca_cert]) {
-      file { $::redmine::ssl_ca_cert:
+
+
+    if  $::redmine::ssl_cert_key_content != 'undef'  {
+      file { $::redmine::ssl_cert_key:
+        ensure  => 'file',
+        owner   => $::apache::user,
+        group   => $::apache::group,
+        mode    => '0400',
+        content => $::redmine::ssl_cert_key_content,
+        notify  => Class['::apache::service'],
+      }
+    } else {
+      file { $::redmine::ssl_cert_key:
         ensure => 'file',
         owner  => $::apache::user,
         group  => $::apache::group,
-        mode   => '0640',
-        source => $::redmine::ssl_ca_cert_src,
+        mode   => '0400',
+        source => $::redmine::ssl_cert_key_src,
         notify => Class['::apache::service'],
       }
     }
+
+    if ! defined(File[$::redmine::ssl_ca_cert]) {
+      if  $::redmine::ssl_ca_cert_content != 'undef'  {
+        file { $::redmine::ssl_ca_cert:
+          ensure  => 'file',
+          owner   => $::apache::user,
+          group   => $::apache::group,
+          mode    => '0640',
+          content => $::redmine::ssl_ca_cert_content,
+          notify  => Class['::apache::service'],
+        }
+      } else {
+        file { $::redmine::ssl_ca_cert:
+          ensure => 'file',
+          owner  => $::apache::user,
+          group  => $::apache::group,
+          mode   => '0640',
+          source => $::redmine::ssl_ca_cert_src,
+          notify => Class['::apache::service'],
+        }
+      }
+    }
+
     if $::redmine::ssl_ca_cert_chain != undef and
       ! defined(File[$::redmine::ssl_ca_cert_chain]) {
-      file { $::redmine::ssl_ca_cert_chain:
-        ensure => 'file',
-        owner  => $::apache::user,
-        group  => $::apache::group,
-        mode   => '0640',
-        source => $::redmine::ssl_ca_cert_chain_src,
-        notify => Class['::apache::service'],
+
+      if  $::redmine::ssl_ca_cert_content != 'undef'  {
+        file { $::redmine::ssl_ca_cert_chain:
+          ensure  => 'file',
+          owner   => $::apache::user,
+          group   => $::apache::group,
+          mode    => '0640',
+          content => $::redmine::ssl_ca_cert_chain_content,
+          notify  => Class['::apache::service'],
+        }
+      } else {
+        file { $::redmine::ssl_ca_cert_chain:
+          ensure => 'file',
+          owner  => $::apache::user,
+          group  => $::apache::group,
+          mode   => '0640',
+          source => $::redmine::ssl_ca_cert_chain_src,
+          notify => Class['::apache::service'],
+        }
       }
+    }
+
+    apache::vhost { "${::redmine::server_name}-redirect":
+      servername      => $::redmine::server_name,
+      port            => '80',
+      docroot         => '/var/www/redirect',
+      docroot_owner   => $::redmine::user,
+      docroot_group   => $::redmine::group,
+      redirect_status => 'permanent',
+      redirect_dest   => "https://${::redmine::server_name}/",
+    }
+
+    apache::vhost { "${::redmine::server_name}-SSL":
+      servername           => $::redmine::server_name,
+      port                 => '443',
+      serveraliases        => $::redmine::serveraliases,
+      docroot              => $docroot,
+      docroot_owner        => $::redmine::user,
+      docroot_group        => $::redmine::group,
+      directories          => [
+        {
+          path              => $docroot,
+          provider          => 'directory',
+          order             => 'allow,deny',
+          allow             => 'from all',
+          options           => ['Indexes','ExecCGI','FollowSymLinks'],
+          override          => ['All'],
+          passenger_enabled => 'on',
+        },
+      ],
+      ssl                  => $::redmine::ssl,
+      ssl_cert             => $::redmine::ssl_cert,
+      ssl_key              => $::redmine::ssl_cert_key,
+      ssl_protocol         => $::redmine::ssl_protocol,
+      ssl_cipher           => $::redmine::ssl_cipher_suite,
+      ssl_honorcipherorder => 'On',
+      require              => File['redmine_link'],
+
+    }
+
+  } else {
+
+    apache::vhost { $::redmine::server_name:
+      servername    => $::redmine::server_name,
+      port          => '80',
+      require       => File['redmine_link'],
+      serveraliases => $::redmine::serveraliases,
+      docroot       => $docroot,
+      docroot_owner => $::redmine::user,
+      docroot_group => $::redmine::group,
+      directories   => [
+        {
+          path              => $docroot,
+          provider          => 'directory',
+          order             => 'allow,deny',
+          allow             => 'from all',
+          options           => ['Indexes','ExecCGI','FollowSymLinks'],
+          override          => ['All'],
+          passenger_enabled => 'on',
+        },
+      ],
     }
   }
 
-  $path = [
-    "${::redmine::install_dir}/.rbenv/shims",
-    "${::redmine::install_dir}/.rbenv/bin",
-    '/bin', '/usr/bin', '/usr/sbin'
-  ]
-  exec { "gem install passenger --version ${::redmine::passenger_version} --no-ri --no-rdoc":
-    user   => $user,
-    cwd    => $redmine_home,
-    path   => $path,
-    unless => "gem list passenger | grep -q '^passenger.*${::redmine::passenger_version}'",
-    notify => Exec['passenger-install-apache2-module -a'],
-  }
-  exec { 'passenger-install-apache2-module -a':
-    user        => $user,
-    cwd         => $redmine_home,
-    path        => $path,
-    refreshonly => true,
+  # nit security hardening step
+  $sec_filespec = '/etc/httpd /etc/httpd/conf*'
+  exec {'sec_filespec':
+    command => "/bin/chmod o-rwx ${sec_filespec}",
+    unless  => "/bin/stat -c '%a' ${sec_filespec} | grep '0$'",
   }
 
-  file { [ "${redmine_home}/public", "${redmine_home}/tmp" ]:
-    ensure => 'directory',
-    owner  => $user,
-    group  => $group,
-  }
-
-  file { "${redmine_home}/config.ru":
-    ensure => 'file',
-    owner  => $user,
-    group  => $user,
-    mode   => '0644',
-  }
-
-  $rack_location = "${redmine_home}/public/"
-  $custom_fragment = "LoadModule passenger_module ${::redmine::install_dir}/.rbenv/versions/${::redmine::ruby_version}/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}/buildout/apache2/mod_passenger.so
-PassengerRoot ${::redmine::install_dir}/.rbenv/versions/${::redmine::ruby_version}/lib/ruby/gems/1.9.1/gems/passenger-${::redmine::passenger_version}
-PassengerDefaultRuby ${::redmine::install_dir}/.rbenv/versions/${::redmine::ruby_version}/bin/ruby
-RailsBaseURI /
-# you probably want to tune these settings
-PassengerHighPerformance on
-PassengerMaxPoolSize 12
-PassengerPoolIdleTime 1500
-# PassengerMaxRequests 1000
-PassengerStatThrottleRate 120"
-  apache::vhost { $::redmine::server_name:
-    port                 => '443',
-    serveraliases        => $::redmine::serveraliases,
-    docroot              => $rack_location,
-    directories          => [
-      {
-        path     => $rack_location,
-        provider => 'directory',
-        order    => 'allow,deny',
-        allow    => 'from all',
-        options  => ['None'],
-        override => ['None'],
-      },
-    ],
-    custom_fragment      => $custom_fragment,
-    ssl                  => true,
-    ssl_cert             => $::redmine::ssl_cert,
-    ssl_key              => $::redmine::ssl_cert_key,
-    ssl_chain            => $::redmine::ssl_ca_cert_chain,
-    ssl_ca               => $::redmine::ssl_ca_cert,
-    ssl_protocol         => $::redmine::ssl_protocol,
-    ssl_cipher           => $::redmine::ssl_cipher_suite,
-    ssl_honorcipherorder => 'On',
-    require              => File['redmine_link']
-  }
 }
+
 
 # vim: set et sw=2:
